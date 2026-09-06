@@ -78,12 +78,15 @@
 
   .side { font-family: 'Helvetica Neue', Arial, sans-serif; }
   .side h3 { font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); margin:0 0 10px; font-weight:600; }
-  .shot-item { padding:10px 0; border-bottom:1px solid var(--line); font-size:13px; }
+  .shot-item { padding:10px 0; border-bottom:1px solid var(--line); font-size:13px; cursor:default; }
   .shot-item .row1 { display:flex; justify-content:space-between; margin-bottom:3px; }
   .shot-item .player { font-weight:600; }
   .shot-item .meta { color:var(--muted); font-size:12px; }
+  .shot-item.linked-hover { background:#fbf6ec; margin:0 -10px; padding:10px; border-radius:4px; }
   .shot-list { max-height:560px; overflow-y:auto; padding-right:6px; }
   .empty { color:var(--muted); font-size:13px; padding:20px 0; }
+  circle.shot-dot { cursor:default; transition:stroke-width 0.1s ease; }
+  circle.shot-dot.linked-hover { stroke:var(--ink); stroke-width:2.5; }
 
   footer { margin-top:40px; padding-top:16px; border-top:1px solid var(--line); font-family:'Helvetica Neue',Arial,sans-serif; font-size:12px; color:var(--muted); }
 </style>
@@ -468,11 +471,21 @@ function conversionScopedShots() {
   });
 }
 
+// Links a shot-list row to its pitch dot: hovering either one highlights both.
+function setShotHighlight(uid, on) {
+  const dot = document.getElementById(`shotdot-${uid}`);
+  const row = document.getElementById(`shotrow-${uid}`);
+  if (dot) dot.classList.toggle("linked-hover", on);
+  if (row) row.classList.toggle("linked-hover", on);
+}
+
 let sitChartInstance = null;
 
 function render() {
   updateMatchLabel();
   const filtered = getFiltered();
+  // Stable per-render id so a shot-list row and its pitch dot can find each other on hover.
+  filtered.forEach((s, i) => { s.__uid = i; });
 
   const dotsGroup = document.getElementById("shotDots");
   dotsGroup.innerHTML = "";
@@ -485,9 +498,15 @@ function render() {
     c.setAttribute("cx", px.toFixed(1)); c.setAttribute("cy", py.toFixed(1)); c.setAttribute("r", r.toFixed(1));
     c.setAttribute("fill", outcomeColor(s.outcome)); c.setAttribute("fill-opacity", "0.88");
     c.setAttribute("stroke", "#fff"); c.setAttribute("stroke-width", "1");
+    c.classList.add("shot-dot");
+    c.id = `shotdot-${s.__uid}`;
+    c.dataset.shotUid = s.__uid;
     const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
     title.textContent = `${s.player} (${s.minute}') \u2014 ${s.outcome}, xG ${s.xg.toFixed(2)}`;
     c.appendChild(title);
+    // Hovering a dot on the pitch also highlights its row in the shot list (reverse link).
+    c.addEventListener("mouseenter", () => setShotHighlight(s.__uid, true));
+    c.addEventListener("mouseleave", () => setShotHighlight(s.__uid, false));
     dotsGroup.appendChild(c);
   });
 
@@ -514,12 +533,17 @@ function render() {
   const allMatchesSelected = matchIds.every(id => matchState[id]);
   [...filtered].sort((a, b) => a.minute - b.minute).forEach(s => {
     const div = document.createElement("div"); div.className = "shot-item";
+    div.id = `shotrow-${s.__uid}`;
+    div.dataset.shotUid = s.__uid;
     const mdTag = allMatchesSelected ? "" : ` \u00b7 ${s.md}`;
     div.innerHTML = `
       <div class="row1"><span class="player">${s.player}</span><span>${s.minute}'</span></div>
       <div class="meta">${s.team}${mdTag} \u00b7 ${s.outcome} \u00b7 xG ${s.xg.toFixed(2)}${s.xgot !== null ? ' \u00b7 xGOT ' + s.xgot.toFixed(2) : ''}</div>
       <div class="meta">${situationLabel(s.situation)} \u00b7 ${s.shotType} \u00b7 ${s.goalZone}</div>
     `;
+    // Hovering a shot's detail row lights up its dot on the pitch (main link).
+    div.addEventListener("mouseenter", () => setShotHighlight(s.__uid, true));
+    div.addEventListener("mouseleave", () => setShotHighlight(s.__uid, false));
     listEl.appendChild(div);
   });
 
