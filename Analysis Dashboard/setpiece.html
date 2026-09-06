@@ -30,11 +30,14 @@
   .season-switch a { color:var(--muted); }
   .season-switch a:hover { color:var(--ink); }
 
-  .range-switch { display:flex; margin-bottom:20px; font-family:'Helvetica Neue',Arial,sans-serif; }
-  .range-switch .pillbar { display:inline-flex; border:1px solid var(--line); border-radius:999px; padding:3px; background:var(--panel); }
-  .range-switch button { display:inline-block; padding:7px 16px; border-radius:999px; font-size:12.5px; font-weight:600; border:none; background:none; cursor:pointer; color:var(--muted); font-family:inherit; }
-  .range-switch button.active { background:var(--red); color:#fff; }
-  .range-switch button:hover:not(.active) { color:var(--ink); }
+  .range-switch { display:flex; align-items:center; gap:10px; margin-bottom:20px; font-family:'Helvetica Neue',Arial,sans-serif; flex-wrap:wrap; }
+  .range-inputs { display:flex; align-items:center; gap:10px; border:1px solid var(--line); border-radius:999px; padding:6px 8px 6px 16px; background:var(--panel); flex-wrap:wrap; }
+  .range-inputs label { display:flex; align-items:center; gap:6px; font-size:12.5px; font-weight:600; color:var(--muted); }
+  .range-inputs input[type="number"] { width:56px; padding:5px 6px; border:1px solid var(--line); border-radius:6px; font-family:inherit; font-size:12.5px; color:var(--ink); background:var(--paper); }
+  .range-inputs input[type="number"]:focus { outline:none; border-color:var(--red); }
+  .range-inputs button { display:inline-block; padding:7px 16px; border-radius:999px; font-size:12.5px; font-weight:600; border:none; background:var(--red); color:#fff; cursor:pointer; font-family:inherit; }
+  .range-inputs button:hover { background:var(--red-dark); }
+  .range-note { font-size:11px; color:var(--muted); }
 
   .stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:24px; }
   @media (max-width:700px) { .stats-row { grid-template-columns:repeat(2,1fr); } }
@@ -88,12 +91,12 @@
   </nav>
 
   <div class="range-switch">
-    <div class="pillbar" id="rangeTabs">
-      <button type="button" data-range="all" class="active">All</button>
-      <button type="button" data-range="5">Last 5</button>
-      <button type="button" data-range="10">Last 10</button>
-      <button type="button" data-range="15">Last 15</button>
+    <div class="range-inputs" id="rangeInputs">
+      <label>From MD <input type="number" id="rangeStart" inputmode="numeric"></label>
+      <label>To MD <input type="number" id="rangeEnd" inputmode="numeric"></label>
+      <button type="button" id="rangeApply">Apply</button>
     </div>
+    <span class="range-note" id="rangeNote"></span>
   </div>
 
   <div class="stats-row" id="statCards"></div>
@@ -175,20 +178,52 @@ function labelFor(s) {
   return `${s.md} vs ${s.short} (${s.venueCode}) ${s.goalsFor}-${s.goalsAgainst}`;
 }
 
-let rangeN = null; // null = all matches
-const rangeTabsEl = document.getElementById("rangeTabs");
-rangeTabsEl.querySelectorAll("button").forEach(btn => {
-  btn.onclick = () => {
-    rangeTabsEl.querySelectorAll("button").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    rangeN = btn.dataset.range === "all" ? null : parseInt(btn.dataset.range, 10);
-    renderMain();
-    renderExplorer();
-  };
+// Match-number range filter — the user enters a start and end MD (e.g. MD5–MD19) and the
+// corresponding data is filtered and displayed. Defaults to the full season range on load.
+function mdNumber(mdStr) {
+  return parseInt(mdStr.slice(2), 10);
+}
+const allMdNumbers = setpiece.map(s => mdNumber(s.md));
+const seasonMinMD = Math.min(...allMdNumbers);
+const seasonMaxMD = Math.max(...allMdNumbers);
+
+const rangeStartEl = document.getElementById("rangeStart");
+const rangeEndEl = document.getElementById("rangeEnd");
+const rangeApplyEl = document.getElementById("rangeApply");
+const rangeNoteEl = document.getElementById("rangeNote");
+
+rangeStartEl.min = seasonMinMD; rangeStartEl.max = seasonMaxMD; rangeStartEl.value = seasonMinMD;
+rangeEndEl.min = seasonMinMD; rangeEndEl.max = seasonMaxMD; rangeEndEl.value = seasonMaxMD;
+
+let rangeStart = seasonMinMD;
+let rangeEnd = seasonMaxMD;
+
+function applyRange() {
+  let start = parseInt(rangeStartEl.value, 10);
+  let end = parseInt(rangeEndEl.value, 10);
+  if (isNaN(start)) start = seasonMinMD;
+  if (isNaN(end)) end = seasonMaxMD;
+  // Keep the range sane regardless of which box the user edits.
+  if (start > end) { const t = start; start = end; end = t; }
+  start = Math.max(seasonMinMD, Math.min(start, seasonMaxMD));
+  end = Math.max(seasonMinMD, Math.min(end, seasonMaxMD));
+  rangeStartEl.value = start;
+  rangeEndEl.value = end;
+  rangeStart = start;
+  rangeEnd = end;
+  const matchCount = scopedSetpiece().length;
+  rangeNoteEl.textContent = `MD${start}–MD${end} (${matchCount} match${matchCount === 1 ? "" : "es"})`;
+  renderMain();
+  renderExplorer();
+}
+
+rangeApplyEl.onclick = applyRange;
+[rangeStartEl, rangeEndEl].forEach(el => {
+  el.addEventListener("keydown", e => { if (e.key === "Enter") applyRange(); });
 });
 
 function scopedSetpiece() {
-  return rangeN ? setpiece.slice(-rangeN) : setpiece;
+  return setpiece.filter(s => mdNumber(s.md) >= rangeStart && mdNumber(s.md) <= rangeEnd);
 }
 
 let cornersChartInstance = null;
@@ -348,8 +383,7 @@ function renderExplorer() {
   });
 }
 
-renderMain();
-renderExplorer();
+applyRange();
 </script>
 </body>
 </html>
