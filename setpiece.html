@@ -30,11 +30,15 @@
   .season-switch a { color:var(--muted); }
   .season-switch a:hover { color:var(--ink); }
 
-  .range-switch { display:flex; margin-bottom:20px; font-family:'Helvetica Neue',Arial,sans-serif; }
-  .range-switch .pillbar { display:inline-flex; border:1px solid var(--line); border-radius:999px; padding:3px; background:var(--panel); }
-  .range-switch button { display:inline-block; padding:7px 16px; border-radius:999px; font-size:12.5px; font-weight:600; border:none; background:none; cursor:pointer; color:var(--muted); font-family:inherit; }
-  .range-switch button.active { background:var(--red); color:#fff; }
-  .range-switch button:hover:not(.active) { color:var(--ink); }
+  .range-switch { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:20px; font-family:'Helvetica Neue',Arial,sans-serif; }
+  .range-field { display:flex; align-items:center; gap:6px; font-size:12.5px; font-weight:600; color:var(--muted); }
+  .range-field input { width:60px; padding:6px 8px; border:1px solid var(--line); border-radius:6px; font-family:inherit; font-size:13px; color:var(--ink); background:var(--panel); }
+  .range-field input:focus { outline:2px solid var(--red); outline-offset:1px; }
+  .range-form button { padding:7px 16px; border-radius:999px; font-size:12.5px; font-weight:600; border:none; cursor:pointer; font-family:inherit; }
+  .range-form button#applyRangeBtn { background:var(--red); color:#fff; }
+  .range-form button#resetRangeBtn { background:none; border:1px solid var(--line); color:var(--muted); }
+  .range-form button#resetRangeBtn:hover { color:var(--ink); }
+  .range-note { font-size:11.5px; color:var(--muted); }
 
   .stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:24px; }
   @media (max-width:700px) { .stats-row { grid-template-columns:repeat(2,1fr); } }
@@ -88,12 +92,13 @@
   </nav>
 
   <div class="range-switch">
-    <div class="pillbar" id="rangeTabs">
-      <button type="button" data-range="all" class="active">All</button>
-      <button type="button" data-range="5">Last 5</button>
-      <button type="button" data-range="10">Last 10</button>
-      <button type="button" data-range="15">Last 15</button>
+    <div class="range-form" id="rangeForm">
+      <label class="range-field">From MD<input type="number" id="mdFromInput" min="1"></label>
+      <label class="range-field">To MD<input type="number" id="mdToInput" min="1"></label>
+      <button type="button" id="applyRangeBtn">Apply</button>
+      <button type="button" id="resetRangeBtn">Reset</button>
     </div>
+    <span class="range-note" id="rangeNote"></span>
   </div>
 
   <div class="stats-row" id="statCards"></div>
@@ -175,20 +180,53 @@ function labelFor(s) {
   return `${s.md} vs ${s.short} (${s.venueCode}) ${s.goalsFor}-${s.goalsAgainst}`;
 }
 
-let rangeN = null; // null = all matches
-const rangeTabsEl = document.getElementById("rangeTabs");
-rangeTabsEl.querySelectorAll("button").forEach(btn => {
-  btn.onclick = () => {
-    rangeTabsEl.querySelectorAll("button").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    rangeN = btn.dataset.range === "all" ? null : parseInt(btn.dataset.range, 10);
-    renderMain();
-    renderExplorer();
-  };
+// MD range filter — user supplies a From/To matchday number rather than a fixed "last N" window.
+function mdNum(md) { return parseInt(md.replace("MD", ""), 10); }
+const allMdNums = setpiece.map(s => mdNum(s.md));
+const minMd = Math.min(...allMdNums);
+const maxMd = Math.max(...allMdNums);
+
+let mdFrom = minMd;
+let mdTo = maxMd;
+
+const mdFromInput = document.getElementById("mdFromInput");
+const mdToInput = document.getElementById("mdToInput");
+const rangeNoteEl = document.getElementById("rangeNote");
+mdFromInput.placeholder = minMd;
+mdToInput.placeholder = maxMd;
+mdFromInput.value = minMd;
+mdToInput.value = maxMd;
+
+function updateRangeNote() {
+  rangeNoteEl.textContent = `Showing MD${String(mdFrom).padStart(2,"0")}–MD${String(mdTo).padStart(2,"0")} (available: MD${String(minMd).padStart(2,"0")}–MD${String(maxMd).padStart(2,"0")})`;
+}
+
+function applyRange() {
+  const fromVal = parseInt(mdFromInput.value, 10);
+  const toVal = parseInt(mdToInput.value, 10);
+  mdFrom = Number.isNaN(fromVal) ? minMd : Math.min(Math.max(fromVal, minMd), maxMd);
+  mdTo = Number.isNaN(toVal) ? maxMd : Math.min(Math.max(toVal, minMd), maxMd);
+  if (mdFrom > mdTo) { const t = mdFrom; mdFrom = mdTo; mdTo = t; }
+  mdFromInput.value = mdFrom;
+  mdToInput.value = mdTo;
+  updateRangeNote();
+  renderMain();
+  renderExplorer();
+}
+
+document.getElementById("applyRangeBtn").onclick = applyRange;
+document.getElementById("resetRangeBtn").onclick = () => {
+  mdFromInput.value = minMd;
+  mdToInput.value = maxMd;
+  applyRange();
+};
+[mdFromInput, mdToInput].forEach(input => {
+  input.addEventListener("keydown", e => { if (e.key === "Enter") applyRange(); });
 });
+updateRangeNote();
 
 function scopedSetpiece() {
-  return rangeN ? setpiece.slice(-rangeN) : setpiece;
+  return setpiece.filter(s => { const n = mdNum(s.md); return n >= mdFrom && n <= mdTo; });
 }
 
 let cornersChartInstance = null;

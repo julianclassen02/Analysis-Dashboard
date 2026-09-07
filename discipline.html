@@ -67,10 +67,12 @@
   .placeholder-flag { font-family:'Helvetica Neue',Arial,sans-serif; font-size:11px; color:#8a0b20; background:#fbe9ec; border:1px solid #e8c2ca; border-radius:4px; padding:8px 12px; margin-bottom:14px; }
 
   .player-name { display:flex; align-items:center; gap:6px; }
-  .red-badge { font-family:'Helvetica Neue',Arial,sans-serif; font-size:10px; font-weight:700; color:#fff; background:var(--red-dark); border-radius:3px; padding:1px 5px; letter-spacing:.02em; }
   .card-boxes { display:flex; gap:4px; }
   .card-box { width:14px; height:19px; border-radius:2px; border:1.5px solid #cfc8b4; background:transparent; }
   .card-box.filled { background:#e0a634; border-color:#b9821f; }
+  .red-card-cell { display:flex; align-items:center; gap:6px; }
+  .red-card-box { width:14px; height:19px; border-radius:2px; background:var(--red-dark); border:1.5px solid #6d0819; display:inline-block; }
+  .red-card-count { font-family:'Helvetica Neue',Arial,sans-serif; font-size:13px; font-weight:600; color:var(--red-dark); }
   .ban-note { color:var(--muted); font-weight:400; }
 </style>
 </head>
@@ -137,6 +139,7 @@
           <th>Player</th>
           <th>Yellow cards</th>
           <th>Status</th>
+          <th>Red cards</th>
         </tr>
       </thead>
       <tbody id="cardTableBody"></tbody>
@@ -266,9 +269,10 @@ squad
     const tr = document.createElement("tr");
     if (p.leagueYellows === 0 && p.redCards === 0) tr.className = "zero-cards";
     tr.innerHTML = `
-      <td><div class="player-name">${p.name}${p.redCards > 0 ? `<span class="red-badge">R×${p.redCards}</span>` : ""}</div></td>
+      <td><div class="player-name">${p.name}</div></td>
       <td>${cardBoxesHtml(p.leagueYellows)}</td>
       <td class="status-${status.level}">${status.label}</td>
+      <td>${p.redCards > 0 ? `<div class="red-card-cell"><span class="red-card-box"></span><span class="red-card-count">x${p.redCards}</span></div>` : ""}</td>
     `;
     cardTableBody.appendChild(tr);
   });
