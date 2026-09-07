@@ -114,7 +114,7 @@
     <h2>Yellow and red cards</h2>
     <div class="desc">2026/27 National League South only.</div>
     <div class="placeholder-flag">
-      Per-player yellow cards are now live from the master tracker for MD01, MD02, MD04 and MD05 (fully reconciled against team totals). Two gaps remain unattributed to a named player: MD03 (team total 2 league yellows; only 1 currently attributed) and MD06 (team total 2 league yellows, 1 red; per-player breakdown not yet extracted). These gaps are excluded from the totals below rather than guessed, so the table may undercount by up to 3 yellows until the extraction is filled in.
+      Per-player yellow and red cards are now fully reconciled against team-level totals for every match played this season (MD01–MD07). The MD03 and MD06 gaps noted earlier have since been backfilled in the master tracker.
     </div>
     <div class="threshold-block">
       <div class="threshold-title">Suspension thresholds — National League South, 2026/27</div>
@@ -151,7 +151,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-const discTeam = [{"md": "MD01", "opponent": "Truro City", "date": "2026-08-08", "foulsFor": 11, "foulsAgainst": 13, "yellowFor": 3, "redFor": 0}, {"md": "MD02", "opponent": "Dorking Wanderers", "date": "2026-08-15", "foulsFor": 15, "foulsAgainst": 16, "yellowFor": 1, "redFor": 0}, {"md": "MD03", "opponent": "Hemel Hempstead Town", "date": "2026-08-18", "foulsFor": 14, "foulsAgainst": 13, "yellowFor": 2, "redFor": 0}, {"md": "MD04", "opponent": "Farnborough", "date": "2026-08-22", "foulsFor": 8, "foulsAgainst": 15, "yellowFor": 1, "redFor": 0}, {"md": "MD05", "opponent": "Chelmsford City", "date": "2026-08-29", "foulsFor": 14, "foulsAgainst": 13, "yellowFor": 1, "redFor": 1}, {"md": "MD06", "opponent": "AFC Totton", "date": "2026-08-31", "foulsFor": 12, "foulsAgainst": 21, "yellowFor": 2, "redFor": 1}];
+const discTeam = [{"md": "MD01", "opponent": "Truro City", "date": "2026-08-08", "foulsFor": 11, "foulsAgainst": 13, "yellowFor": 3, "redFor": 0}, {"md": "MD02", "opponent": "Dorking Wanderers", "date": "2026-08-15", "foulsFor": 15, "foulsAgainst": 16, "yellowFor": 1, "redFor": 0}, {"md": "MD03", "opponent": "Hemel Hempstead Town", "date": "2026-08-18", "foulsFor": 14, "foulsAgainst": 13, "yellowFor": 2, "redFor": 0}, {"md": "MD04", "opponent": "Farnborough", "date": "2026-08-22", "foulsFor": 8, "foulsAgainst": 15, "yellowFor": 1, "redFor": 0}, {"md": "MD05", "opponent": "Chelmsford City", "date": "2026-08-29", "foulsFor": 14, "foulsAgainst": 13, "yellowFor": 1, "redFor": 1}, {"md": "MD06", "opponent": "AFC Totton", "date": "2026-08-31", "foulsFor": 12, "foulsAgainst": 21, "yellowFor": 2, "redFor": 1}, {"md": "MD07", "opponent": "Dover Athletic", "date": "2026-09-05", "foulsFor": 16, "foulsAgainst": 10, "yellowFor": 2, "redFor": 0}];
 const totalFouls = discTeam.reduce((a,d)=>a+d.foulsFor,0);
 const totalYellow = discTeam.reduce((a,d)=>a+d.yellowFor,0);
 const totalRed = discTeam.reduce((a,d)=>a+d.redFor,0);
@@ -191,25 +191,24 @@ new Chart(document.getElementById("teamChart"), {
 });
 
 // --- Squad yellow-card status ---
-// leagueYellows/redCards below are reconciled against each match's team-level totals (MD01, MD02, MD04, MD05).
-// MD03 (1 of 2 team yellows attributed) and MD06 (2 yellows, 1 red, no per-player breakdown yet) are known
-// gaps — see the flag note above — and are deliberately left out of these totals rather than guessed.
+// leagueYellows/redCards below are reconciled against each match's team-level totals for MD01–MD07 (all
+// seven matches fully reconciled, no known gaps as of this update).
 const squad = [
   { name: "Jordi van Stappershoef", pos: "G", leagueYellows: 0, redCards: 0, cupYellows: 0 },
-  { name: "Jordan Ragguette", pos: "D", leagueYellows: 0, redCards: 0, cupYellows: 0 },
+  { name: "Jordan Ragguette", pos: "D", leagueYellows: 1, redCards: 0, cupYellows: 0 },
   { name: "Remy Clerima", pos: "D", leagueYellows: 1, redCards: 0, cupYellows: 0 },
   { name: "Joel Odeniran", pos: "D", leagueYellows: 0, redCards: 0, cupYellows: 0 },
   { name: "George Abbott", pos: "D", leagueYellows: 0, redCards: 0, cupYellows: 0 },
   { name: "Manny Onariase", pos: "D", leagueYellows: 0, redCards: 0, cupYellows: 0 },
-  { name: "Miles Welch-Hayes", pos: "D", leagueYellows: 0, redCards: 0, cupYellows: 0 },
+  { name: "Miles Welch-Hayes", pos: "D", leagueYellows: 1, redCards: 0, cupYellows: 0 },
   { name: "Matthew Achuba", pos: "M", leagueYellows: 1, redCards: 1, cupYellows: 0 },
   { name: "Christian N'Guessan", pos: "M", leagueYellows: 0, redCards: 0, cupYellows: 0 },
   { name: "Joshua Johnson", pos: "M", leagueYellows: 1, redCards: 0, cupYellows: 0 },
   { name: "Owen Cochrane", pos: "M", leagueYellows: 0, redCards: 0, cupYellows: 0 },
   { name: "Finley Welch", pos: "M", leagueYellows: 0, redCards: 0, cupYellows: 0 },
-  { name: "Jayden Mitchell-Lawson", pos: "F", leagueYellows: 0, redCards: 0, cupYellows: 0 },
-  { name: "Josh Coley", pos: "F", leagueYellows: 0, redCards: 0, cupYellows: 0 },
-  { name: "Josh Umerah", pos: "F", leagueYellows: 1, redCards: 0, cupYellows: 0 },
+  { name: "Jayden Mitchell-Lawson", pos: "F", leagueYellows: 1, redCards: 0, cupYellows: 0 },
+  { name: "Josh Coley", pos: "F", leagueYellows: 1, redCards: 1, cupYellows: 0 },
+  { name: "Josh Umerah", pos: "F", leagueYellows: 2, redCards: 0, cupYellows: 0 },
   { name: "Alfie Pendlebury", pos: "F", leagueYellows: 1, redCards: 0, cupYellows: 0 },
   { name: "Daniel Nkrumah", pos: "F", leagueYellows: 1, redCards: 0, cupYellows: 0 },
   { name: "Connor Hall", pos: "F", leagueYellows: 1, redCards: 0, cupYellows: 0 },
@@ -217,7 +216,7 @@ const squad = [
 
 // Suspension logic — thresholds are cumulative league-only totals, each gated by a match-number/date cutoff.
 // current match number / date used to evaluate whether a threshold's cutoff has passed.
-const CURRENT_MD = 6;               // update as the season progresses
+const CURRENT_MD = 7;               // update as the season progresses
 const CURRENT_DATE = new Date("2026-09-05");
 const DEC31_2026 = new Date("2026-12-31");
 
