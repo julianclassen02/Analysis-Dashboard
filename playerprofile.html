@@ -89,7 +89,7 @@
   </nav>
 
   <div class="placeholder-flag">
-    <b>Placeholder page.</b> Squad names and positions are correct, but no per-player profile data is wired in yet — the radar and metric table below show the categories and layout this page will use once a Wyscout data feed is connected. Age, nationality, height, and every stat value are placeholders, not real figures.
+    <b>Test build — partial data.</b> Squad names and positions are correct. Categories sourced from Sofascore (passing, duels, defensive actions, chance creation, shooting) are now populated from the master sheet's per-player extraction for <b>MD01&ndash;MD04</b> (all 18 squad players have complete rows for those matches); MD05 currently has only the goalkeeper's row logged, and MD06&ndash;MD07 have not yet been entered into the Player stats 26/27 tab. Sample size is small (2&ndash;4 matches per player) — treat these as an early look, not settled per-90 rates. Age, nationality, height, preferred foot, contract status, and any category tagged "Wyscout" below remain placeholders pending that data feed.
   </div>
 
   <div class="layout">
@@ -126,7 +126,7 @@
   </div>
 
   <footer>
-    Maidenhead United — internal analysis dashboard. Data pending: Wyscout integration (technical event detail, physical/broadcast-tracking metrics, player bio fields).
+    Maidenhead United — internal analysis dashboard. Sofascore-sourced categories (passing, duels, defensive actions, chance creation, shooting, aerial duels) are populated from the master sheet's per-player extraction, currently covering MD01&ndash;MD04 fully and MD05 (goalkeeper only) — MD06&ndash;MD07 are not yet entered into the Player stats 26/27 tab. Still pending: Wyscout integration (progression, physical/broadcast-tracking metrics, player bio fields, goalkeeper shot-stopping/aerial claims/sweeping/command of box).
   </footer>
 
 </div>
@@ -180,6 +180,386 @@ const radarTemplates = {
   }
 };
 
+// --- Computed player data (Sofascore extraction, 26/27 season) ---
+// Source: master sheet "Player stats 26/27" tab. Aggregated MD01-MD04 (all 18 squad
+// players have complete per-player rows for these 4 matches). MD05 currently has only
+// the goalkeeper's row logged in that tab; MD06 and MD07 have not yet been entered into
+// Player stats 26/27 (they exist in Team stats / Shot log, but per-player rows are pending
+// extraction/transfer into the master sheet). See the data-quality note below the squad
+// panel. "Last 5 matches" currently draws on the same MD01-05 sample as "Full season"
+// until more matchdays are added to the sheet.
+const radarValues = {
+  "Jordan Ragguette": {
+    "Duels won": 61.8,
+    "Aerial duels": 55.6,
+    "Defensive actions": 7.2,
+    "Passing": 62.8,
+    "Progression": null,
+    "Physical output": null
+  },
+  "Remy Clerima": {
+    "Duels won": 69.3,
+    "Aerial duels": 79.2,
+    "Defensive actions": 100.0,
+    "Passing": 80.9,
+    "Progression": null,
+    "Physical output": null
+  },
+  "Joel Odeniran": {
+    "Duels won": 62.3,
+    "Aerial duels": 68.8,
+    "Defensive actions": 30.8,
+    "Passing": 75.4,
+    "Progression": null,
+    "Physical output": null
+  },
+  "George Abbott": {
+    "Duels won": 64.3,
+    "Aerial duels": 77.8,
+    "Defensive actions": 24.7,
+    "Passing": 79.0,
+    "Progression": null,
+    "Physical output": null
+  },
+  "Manny Onariase": {
+    "Duels won": 71.4,
+    "Aerial duels": 75.0,
+    "Defensive actions": 90.6,
+    "Passing": 78.9,
+    "Progression": null,
+    "Physical output": null
+  },
+  "Miles Welch-Hayes": {
+    "Duels won": 39.1,
+    "Aerial duels": 23.1,
+    "Defensive actions": 0.0,
+    "Passing": 70.0,
+    "Progression": null,
+    "Physical output": null
+  },
+  "Matthew Achuba": {
+    "Passing": 84.3,
+    "Progression": null,
+    "Duels won": 63.6,
+    "Defensive actions": 38.7,
+    "Chance creation": 68.1,
+    "Physical output": null
+  },
+  "Christian N'Guessan": {
+    "Passing": 84.0,
+    "Progression": null,
+    "Duels won": 61.1,
+    "Defensive actions": 43.9,
+    "Chance creation": 0.0,
+    "Physical output": null
+  },
+  "Joshua Johnson": {
+    "Passing": 80.4,
+    "Progression": null,
+    "Duels won": 46.5,
+    "Defensive actions": 0.0,
+    "Chance creation": 0.0,
+    "Physical output": null
+  },
+  "Owen Cochrane": {
+    "Passing": 57.1,
+    "Progression": null,
+    "Duels won": 42.9,
+    "Defensive actions": 100.0,
+    "Chance creation": 100.0,
+    "Physical output": null
+  },
+  "Finley Welch": {
+    "Passing": 85.1,
+    "Progression": null,
+    "Duels won": 46.9,
+    "Defensive actions": 33.8,
+    "Chance creation": 0.0,
+    "Physical output": null
+  },
+  "Jayden Mitchell-Lawson": {
+    "Shooting (xG)": 10.5,
+    "Chance creation": 38.3,
+    "Take-ons": 100.0,
+    "Aerial / hold-up": 0.0,
+    "Defensive work": 100.0,
+    "Physical output": null
+  },
+  "Josh Coley": {
+    "Shooting (xG)": 100.0,
+    "Chance creation": 83.5,
+    "Take-ons": 56.7,
+    "Aerial / hold-up": 33.3,
+    "Defensive work": 53.0,
+    "Physical output": null
+  },
+  "Josh Umerah": {
+    "Shooting (xG)": 34.2,
+    "Chance creation": 42.0,
+    "Take-ons": 0.0,
+    "Aerial / hold-up": 29.6,
+    "Defensive work": 87.3,
+    "Physical output": null
+  },
+  "Alfie Pendlebury": {
+    "Shooting (xG)": 23.7,
+    "Chance creation": 66.0,
+    "Take-ons": 19.2,
+    "Aerial / hold-up": 33.3,
+    "Defensive work": 78.7,
+    "Physical output": null
+  },
+  "Daniel Nkrumah": {
+    "Shooting (xG)": 63.2,
+    "Chance creation": 100.0,
+    "Take-ons": 29.1,
+    "Aerial / hold-up": 7.1,
+    "Defensive work": 11.9,
+    "Physical output": null
+  },
+  "Connor Hall": {
+    "Shooting (xG)": 0.0,
+    "Chance creation": 0.0,
+    "Take-ons": 0.0,
+    "Aerial / hold-up": 0.0,
+    "Defensive work": 0.0,
+    "Physical output": null
+  },
+  "Jordi van Stappershoef": {
+    "Shot-stopping": null,
+    "Distribution": 70.6,
+    "Aerial claims": null,
+    "Sweeping / off-line": null,
+    "Command of box": null,
+    "Physical output": null
+  }
+};
+
+const metricDisplay = {
+  "Jordi van Stappershoef": {
+    "Distribution": null
+  },
+  "Jordan Ragguette": {
+    "Duels won": 61.8,
+    "Aerial duels": 55.6,
+    "Defensive actions": 8.38,
+    "Passing": 62.8
+  },
+  "Remy Clerima": {
+    "Duels won": 69.3,
+    "Aerial duels": 79.2,
+    "Defensive actions": 16.0,
+    "Passing": 80.9
+  },
+  "Joel Odeniran": {
+    "Duels won": 62.3,
+    "Aerial duels": 68.8,
+    "Defensive actions": 10.32,
+    "Passing": 75.4
+  },
+  "George Abbott": {
+    "Duels won": 64.3,
+    "Aerial duels": 77.8,
+    "Defensive actions": 9.82,
+    "Passing": 79.0
+  },
+  "Manny Onariase": {
+    "Duels won": 71.4,
+    "Aerial duels": 75.0,
+    "Defensive actions": 15.23,
+    "Passing": 78.9
+  },
+  "Miles Welch-Hayes": {
+    "Duels won": 39.1,
+    "Aerial duels": 23.1,
+    "Defensive actions": 7.79,
+    "Passing": 70.0
+  },
+  "Matthew Achuba": {
+    "Passing": 84.3,
+    "Duels won": 63.6,
+    "Defensive actions": 4.05,
+    "Chance creation": 0.62
+  },
+  "Christian N'Guessan": {
+    "Passing": 84.0,
+    "Duels won": 61.1,
+    "Defensive actions": 4.4,
+    "Chance creation": 0.0
+  },
+  "Joshua Johnson": {
+    "Passing": 80.4,
+    "Duels won": 46.5,
+    "Defensive actions": 1.44,
+    "Chance creation": 0.0
+  },
+  "Owen Cochrane": {
+    "Passing": 57.1,
+    "Duels won": 42.9,
+    "Defensive actions": 8.18,
+    "Chance creation": 0.91
+  },
+  "Finley Welch": {
+    "Passing": 85.1,
+    "Duels won": 46.9,
+    "Defensive actions": 3.72,
+    "Chance creation": 0.0
+  },
+  "Jayden Mitchell-Lawson": {
+    "Shooting (xG)": 0.04,
+    "Chance creation": 0.72,
+    "Take-ons": 3.23,
+    "Aerial / hold-up": 0.0,
+    "Defensive work": 3.94
+  },
+  "Josh Coley": {
+    "Shooting (xG)": 0.38,
+    "Chance creation": 1.57,
+    "Take-ons": 1.83,
+    "Aerial / hold-up": 33.3,
+    "Defensive work": 2.09
+  },
+  "Josh Umerah": {
+    "Shooting (xG)": 0.13,
+    "Chance creation": 0.79,
+    "Take-ons": 0.0,
+    "Aerial / hold-up": 29.6,
+    "Defensive work": 3.44
+  },
+  "Alfie Pendlebury": {
+    "Shooting (xG)": 0.09,
+    "Chance creation": 1.24,
+    "Take-ons": 0.62,
+    "Aerial / hold-up": 33.3,
+    "Defensive work": 3.1
+  },
+  "Daniel Nkrumah": {
+    "Shooting (xG)": 0.24,
+    "Chance creation": 1.88,
+    "Take-ons": 0.94,
+    "Aerial / hold-up": 7.1,
+    "Defensive work": 0.47
+  },
+  "Connor Hall": {
+    "Shooting (xG)": 0.0,
+    "Chance creation": 0.0,
+    "Take-ons": 0.0,
+    "Aerial / hold-up": 0.0,
+    "Defensive work": 0.0
+  }
+};
+
+const playerBio = {
+  "Jordi van Stappershoef": {
+    "apps": 5,
+    "mins": 450,
+    "pass_pct": 80.4,
+    "longball_pct": 60.7
+  },
+  "Jordan Ragguette": {
+    "apps": 4,
+    "mins": 333,
+    "pass_pct": 62.8,
+    "longball_pct": 50.0
+  },
+  "Remy Clerima": {
+    "apps": 4,
+    "mins": 360,
+    "pass_pct": 80.9,
+    "longball_pct": 53.3
+  },
+  "Joel Odeniran": {
+    "apps": 4,
+    "mins": 314,
+    "pass_pct": 75.4,
+    "longball_pct": 58.3
+  },
+  "George Abbott": {
+    "apps": 4,
+    "mins": 275,
+    "pass_pct": 79.0,
+    "longball_pct": 46.9
+  },
+  "Manny Onariase": {
+    "apps": 3,
+    "mins": 65,
+    "pass_pct": 78.9,
+    "longball_pct": 50.0
+  },
+  "Miles Welch-Hayes": {
+    "apps": 2,
+    "mins": 104,
+    "pass_pct": 70.0,
+    "longball_pct": 0.0
+  },
+  "Matthew Achuba": {
+    "apps": 4,
+    "mins": 289,
+    "pass_pct": 84.3,
+    "longball_pct": 12.5
+  },
+  "Christian N'Guessan": {
+    "apps": 3,
+    "mins": 184,
+    "pass_pct": 84.0,
+    "longball_pct": 33.3
+  },
+  "Joshua Johnson": {
+    "apps": 3,
+    "mins": 250,
+    "pass_pct": 80.4,
+    "longball_pct": 72.7
+  },
+  "Owen Cochrane": {
+    "apps": 2,
+    "mins": 99,
+    "pass_pct": 57.1,
+    "longball_pct": 28.6
+  },
+  "Finley Welch": {
+    "apps": 4,
+    "mins": 145,
+    "pass_pct": 85.1,
+    "longball_pct": 0.0
+  },
+  "Jayden Mitchell-Lawson": {
+    "apps": 3,
+    "mins": 251,
+    "pass_pct": 78.5,
+    "longball_pct": 66.7
+  },
+  "Josh Coley": {
+    "apps": 4,
+    "mins": 344,
+    "pass_pct": 70.0,
+    "longball_pct": 0.0
+  },
+  "Josh Umerah": {
+    "apps": 4,
+    "mins": 340,
+    "pass_pct": 79.4,
+    "longball_pct": 75.0
+  },
+  "Alfie Pendlebury": {
+    "apps": 4,
+    "mins": 145,
+    "pass_pct": 54.5,
+    "longball_pct": null
+  },
+  "Daniel Nkrumah": {
+    "apps": 4,
+    "mins": 192,
+    "pass_pct": 69.6,
+    "longball_pct": null
+  },
+  "Connor Hall": {
+    "apps": 1,
+    "mins": 13,
+    "pass_pct": 75.0,
+    "longball_pct": null
+  }
+};
+
 let currentPlayer = squad[0];
 
 function renderSquadList() {
@@ -207,6 +587,11 @@ function renderSquadList() {
 
 function renderBio() {
   const el = document.getElementById("bioPanel");
+  const bio = playerBio[currentPlayer.name];
+  const appsHtml = bio ? `<div class="value">${bio.apps} <span style="font-size:11px;color:var(--muted);">(MD01&ndash;05 sample)</span></div>`
+                       : `<div class="value pending">Not yet in sheet</div>`;
+  const minsHtml = bio ? `<div class="value">${bio.mins}'</div>`
+                       : `<div class="value pending">Not yet in sheet</div>`;
   el.innerHTML = `
     <div class="bio-row">
       <div>
@@ -219,8 +604,8 @@ function renderBio() {
       <div class="bio-field"><div class="label">Age</div><div class="value pending">Pending Wyscout</div></div>
       <div class="bio-field"><div class="label">Nationality</div><div class="value pending">Pending Wyscout</div></div>
       <div class="bio-field"><div class="label">Height</div><div class="value pending">Pending Wyscout</div></div>
-      <div class="bio-field"><div class="label">Appearances (26/27)</div><div class="value pending">Not wired yet</div></div>
-      <div class="bio-field"><div class="label">Minutes played</div><div class="value pending">Not wired yet</div></div>
+      <div class="bio-field"><div class="label">Appearances (26/27)</div>${appsHtml}</div>
+      <div class="bio-field"><div class="label">Minutes played</div>${minsHtml}</div>
       <div class="bio-field"><div class="label">Preferred foot</div><div class="value pending">Pending Wyscout</div></div>
       <div class="bio-field"><div class="label">Contract status</div><div class="value pending">Pending Wyscout</div></div>
     </div>
@@ -244,12 +629,17 @@ function renderRadarToggle() {
 
 function renderRadar() {
   const tpl = radarTemplates[currentPlayer.pos];
+  const rv = radarValues[currentPlayer.name] || {};
   document.getElementById("radarTitle").textContent = posLabel[currentPlayer.pos] + " profile radar";
   document.getElementById("radarDesc").textContent =
-    "Categories shown are the " + posLabel[currentPlayer.pos].toLowerCase() + "-specific template this page will populate. All values placeholder (0) until data is wired in.";
+    "Sofascore-sourced categories are scaled 0-100 as this player's percentile within the " + posLabel[currentPlayer.pos].toLowerCase() +
+    " group (MD01-05 sample, squad of " + squad.filter(p => p.pos === currentPlayer.pos).length + "). Categories tagged Wyscout below are still 0 / pending.";
 
   const ctx = document.getElementById("radarChart").getContext("2d");
-  const data = tpl.categories.map(() => 0); // placeholder — no data source wired yet
+  const data = tpl.categories.map(cat => {
+    const v = rv[cat];
+    return (v === undefined || v === null) ? 0 : v;
+  });
 
   if (chart) chart.destroy();
   chart = new Chart(ctx, {
@@ -283,13 +673,29 @@ function renderRadar() {
   });
 }
 
+// Which unit each raw metric is displayed in (for the categories we can compute from Sofascore)
+const metricUnit = {
+  "Duels won": "%", "Aerial duels": "%", "Passing": "%", "Aerial / hold-up": "%",
+  "Defensive actions": "/90", "Chance creation": "/90", "Shooting (xG)": " xG/90", "Take-ons": "/90", "Defensive work": "/90"
+};
+
 function renderMetricTable() {
   const tpl = radarTemplates[currentPlayer.pos];
+  const disp = metricDisplay[currentPlayer.name] || {};
+  const bio = playerBio[currentPlayer.name];
   const body = document.getElementById("metricTableBody");
   body.innerHTML = "";
   tpl.categories.forEach(cat => {
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${cat}</td><td class="num pending">—</td><td class="pending">${tpl.source[cat]}</td>`;
+    if (cat === "Distribution" && currentPlayer.pos === "G" && bio) {
+      // Goalkeeper distribution: show pass% / long-ball% directly since it's Sofascore-sourced
+      tr.innerHTML = `<td>${cat}</td><td class="num">${bio.pass_pct}% pass / ${bio.longball_pct}% long</td><td>${tpl.source[cat]}</td>`;
+    } else if (Object.prototype.hasOwnProperty.call(disp, cat) && disp[cat] !== null && disp[cat] !== undefined) {
+      const unit = metricUnit[cat] || "";
+      tr.innerHTML = `<td>${cat}</td><td class="num">${disp[cat]}${unit}</td><td>${tpl.source[cat]} &mdash; MD01&ndash;05 sample</td>`;
+    } else {
+      tr.innerHTML = `<td>${cat}</td><td class="num pending">—</td><td class="pending">${tpl.source[cat]}</td>`;
+    }
     body.appendChild(tr);
   });
 }
