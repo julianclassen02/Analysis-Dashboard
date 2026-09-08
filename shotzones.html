@@ -25,6 +25,12 @@
   nav a.active { color:var(--red); font-weight:600; border-bottom:2px solid var(--red); padding-bottom:4px; }
   nav a:hover { color:var(--ink); }
 
+  .view-switch { display:flex; justify-content:center; margin-bottom:22px; font-family:'Helvetica Neue',Arial,sans-serif; }
+  .view-switch .pillbar { display:inline-flex; border:1px solid var(--line); border-radius:999px; padding:3px; background:var(--panel); }
+  .view-switch button { display:inline-block; padding:8px 18px; border-radius:999px; font-size:12.5px; font-weight:600; letter-spacing:.02em; border:none; background:none; cursor:pointer; color:var(--muted); font-family:inherit; }
+  .view-switch button.active { background:var(--red); color:#fff; }
+  .view-switch button:hover:not(.active) { color:var(--ink); }
+
   .layout { display: grid; grid-template-columns: 200px 1fr 260px; gap: 24px; align-items: start; }
   @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
 
@@ -37,7 +43,6 @@
   .link-sep { color:var(--line); margin:0 4px; font-size:11px; }
   select { width:100%; padding:8px 10px; font-size:13px; border:1px solid var(--line); border-radius:3px; background:var(--panel); color:var(--ink); font-family:inherit; }
   .chip-row { display:flex; flex-direction:column; gap:6px; }
-  .chip-row.chip-row-wrap { flex-direction:row; flex-wrap:wrap; gap:8px; }
 
   .match-dropdown { position:relative; }
   .match-dropdown-toggle { width:100%; text-align:left; padding:8px 10px; font-size:13px; border:1px solid var(--line); border-radius:3px; background:var(--panel); color:var(--ink); cursor:pointer; font-family:inherit; }
@@ -59,20 +64,28 @@
   .metric-btn.active { background:var(--red); border-color:var(--red); color:#fff; font-weight:600; }
   .metric-btn:hover:not(.active) { border-color:var(--red); }
 
+  .slider-row { display:flex; flex-direction:column; gap:6px; }
+  .slider-row input[type="range"] { width:100%; }
+  .slider-row .slider-labels { display:flex; justify-content:space-between; font-size:11px; color:var(--muted); }
+
   .toggle-row { display:flex; align-items:center; gap:8px; font-size:13px; }
   .toggle-row input { margin:0; }
 
   .center-col { min-width: 0; }
   .pitch-frame { background:var(--panel); border:1px solid var(--line); border-radius:4px; padding:16px; }
-  svg#pitch { width:100%; height:auto; display:block; background:var(--pitch); border-radius:3px; }
+  .pitch-stack { position:relative; width:100%; aspect-ratio: 400 / 300; background:var(--pitch); border-radius:3px; overflow:hidden; }
+  .pitch-stack canvas, .pitch-stack svg { position:absolute; top:0; left:0; width:100%; height:100%; }
+  .pitch-stack svg { pointer-events:none; }
   .zone-cell { cursor:default; }
   .zone-label { font-family:'Helvetica Neue',Arial,sans-serif; font-size:8.5px; fill:rgba(255,255,255,0.85); pointer-events:none; }
   .zone-value { font-family:Georgia,serif; font-size:13px; fill:#ffffff; pointer-events:none; font-weight:600; }
-  .shot-dot-ghost { fill:#ffffff; fill-opacity:0.55; stroke:#14110f; stroke-width:0.6; }
+  .shot-dot-ghost { fill:#ffffff; fill-opacity:0.6; stroke:#14110f; stroke-width:0.6; pointer-events:auto; cursor:default; }
 
   .legend-row { display:flex; align-items:center; gap:10px; margin-top:12px; font-family:'Helvetica Neue',Arial,sans-serif; font-size:12px; color:var(--muted); flex-wrap:wrap; }
   .legend-scale { display:flex; align-items:center; gap:6px; }
-  .legend-gradient { width:120px; height:10px; border-radius:2px; background:linear-gradient(to right, #fdf1e8, var(--red)); border:1px solid var(--line); }
+  .legend-gradient { width:120px; height:10px; border-radius:2px; }
+  .legend-gradient.grid { background:linear-gradient(to right, #fdf1e8, var(--red)); border:1px solid var(--line); }
+  .legend-gradient.heat { background:linear-gradient(to right, rgba(253,241,232,0), var(--red)); border:1px solid var(--line); }
 
   .stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:18px; }
   .stat-card { background:var(--panel); border:1px solid var(--line); border-radius:4px; padding:12px 14px; font-family:'Helvetica Neue',Arial,sans-serif; }
@@ -85,7 +98,6 @@
   .side { font-family: 'Helvetica Neue', Arial, sans-serif; }
   .side h3 { font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); margin:0 0 10px; font-weight:600; }
   .side .note { font-size:12px; color:var(--muted); line-height:1.5; margin-top:10px; }
-  .empty { color:var(--muted); font-size:13px; padding:20px 0; }
 
   footer { margin-top:40px; padding-top:16px; border-top:1px solid var(--line); font-family:'Helvetica Neue',Arial,sans-serif; font-size:12px; color:var(--muted); }
 </style>
@@ -110,6 +122,13 @@
     <a href="setpiece.html">Set pieces</a>
     <a href="discipline.html">Discipline</a>
   </nav>
+
+  <div class="view-switch">
+    <div class="pillbar">
+      <button type="button" id="viewGridBtn" class="active">Zone grid</button>
+      <button type="button" id="viewHeatBtn">Smoothed heatmap</button>
+    </div>
+  </div>
 
   <div class="filter-group" style="margin-bottom:20px;">
     <div class="fg-header">
@@ -170,8 +189,15 @@
         <div class="chip-row" id="outcomeChips"></div>
       </div>
       <div class="filter-group">
-        <h3 style="margin-bottom:10px;">Zone colour</h3>
+        <h3 id="metricGroupTitle" style="margin-bottom:10px;">Zone colour</h3>
         <div class="metric-row" id="metricButtons"></div>
+      </div>
+      <div class="filter-group" id="bandwidthGroup" style="display:none;">
+        <h3 style="margin-bottom:10px;">Smoothing radius</h3>
+        <div class="slider-row">
+          <input type="range" id="bandwidthSlider" min="8" max="40" value="20" step="1">
+          <div class="slider-labels"><span>Tight</span><span id="bandwidthValue">20</span><span>Broad</span></div>
+        </div>
       </div>
       <div class="filter-group">
         <div class="toggle-row">
@@ -183,19 +209,22 @@
 
     <div class="center-col">
       <div class="pitch-frame">
-        <svg id="pitch" viewBox="0 0 400 300">
-          <rect x="10" y="10" width="380" height="280" fill="none" stroke="var(--pitch-line)" stroke-width="1.2"/>
-          <g id="zoneCells"></g>
-          <rect x="87.4" y="10" width="225.2" height="125.7" fill="none" stroke="var(--pitch-line)" stroke-width="1.2"/>
-          <rect x="148.8" y="10" width="102.4" height="41.9" fill="none" stroke="var(--pitch-line)" stroke-width="1.2"/>
-          <rect x="179.5" y="0" width="41" height="10" fill="none" stroke="var(--pitch-line)" stroke-width="2"/>
-          <circle cx="200" cy="93.8" r="1.6" fill="var(--pitch-line)"/>
-          <path d="M 156 135.7 A 73 73 0 0 0 244 135.7" fill="none" stroke="var(--pitch-line)" stroke-width="1.2"/>
-          <g id="zoneLabels"></g>
-          <g id="shotDots"></g>
-        </svg>
+        <div class="pitch-stack">
+          <canvas id="heatCanvas" width="800" height="600"></canvas>
+          <svg id="pitchLines" viewBox="0 0 400 300">
+            <rect x="10" y="10" width="380" height="280" fill="none" stroke="var(--pitch-line)" stroke-width="1.2"/>
+            <g id="zoneCells"></g>
+            <rect x="87.4" y="10" width="225.2" height="125.7" fill="none" stroke="var(--pitch-line)" stroke-width="1.2"/>
+            <rect x="148.8" y="10" width="102.4" height="41.9" fill="none" stroke="var(--pitch-line)" stroke-width="1.2"/>
+            <rect x="179.5" y="0" width="41" height="10" fill="none" stroke="var(--pitch-line)" stroke-width="2"/>
+            <circle cx="200" cy="93.8" r="1.6" fill="var(--pitch-line)"/>
+            <path d="M 156 135.7 A 73 73 0 0 0 244 135.7" fill="none" stroke="var(--pitch-line)" stroke-width="1.2"/>
+            <g id="zoneLabels"></g>
+            <g id="shotDots" style="pointer-events:auto;"></g>
+          </svg>
+        </div>
         <div class="legend-row">
-          <div class="legend-scale"><span>Low</span><div class="legend-gradient"></div><span>High</span></div>
+          <div class="legend-scale"><span>Low</span><div class="legend-gradient grid" id="legendGrad"></div><span>High</span></div>
           <span id="metricCaption" style="margin-left:auto;"></span>
         </div>
       </div>
@@ -203,15 +232,18 @@
       <div class="breakdown">
         <h3 id="breakdownTitle">Zone breakdown</h3>
         <div style="position:relative; width:100%; height:280px;">
-          <canvas id="zoneChart" role="img" aria-label="Bar chart of shots by pitch zone"></canvas>
+          <canvas id="breakdownChart" role="img" aria-label="Bar chart"></canvas>
         </div>
       </div>
     </div>
 
     <div class="side">
       <h3>About this page</h3>
-      <div class="note">
-        Pitch is divided into nine zones by depth (six-yard box / penalty area / edge of box) and width (left / central / right channel). Zone colour and the breakdown chart reflect the metric selected on the left. Hover a zone for exact figures.
+      <div class="note" id="aboutGrid">
+        <strong>Zone grid:</strong> pitch is divided into nine fixed zones by depth (six-yard box / penalty area / edge of box) and width (left / central / right channel). Hover a zone for exact figures.
+      </div>
+      <div class="note" id="aboutHeat" style="display:none;">
+        <strong>Smoothed heatmap:</strong> each shot contributes a soft, radius-limited blob rather than a hard cell boundary, and overlapping blobs accumulate — areas with more shots (or higher weight) read darker/redder. Adjust the smoothing radius to see how the picture changes. With only 7 matchdays of 2026/27 data, expect this to look patchier than a full-season sample.
       </div>
       <div class="note">
         Shot map coordinates are sourced from Sofascore's shotmap endpoint. Data quality gaps are documented per matchday on the Discipline page's data conventions.
@@ -258,6 +290,15 @@ const playerChipsEl = document.getElementById("playerChips");
 const matchChipsEl = document.getElementById("matchChips");
 const matchLabel = document.getElementById("matchLabel");
 const metricButtonsEl = document.getElementById("metricButtons");
+const metricGroupTitle = document.getElementById("metricGroupTitle");
+const bandwidthGroup = document.getElementById("bandwidthGroup");
+const bandwidthSlider = document.getElementById("bandwidthSlider");
+const bandwidthValue = document.getElementById("bandwidthValue");
+const legendGrad = document.getElementById("legendGrad");
+const aboutGrid = document.getElementById("aboutGrid");
+const aboutHeat = document.getElementById("aboutHeat");
+const heatCanvas = document.getElementById("heatCanvas");
+const heatCtx = heatCanvas.getContext("2d");
 
 const matchIds = Object.keys(matches);
 const matchState = {};
@@ -275,23 +316,57 @@ outcomeOrder.forEach(o => outcomeState[o] = true);
 
 const playerState = {};
 
-const metrics = [
+// --- View mode toggle ---
+let viewMode = "grid"; // "grid" | "heat"
+const viewGridBtn = document.getElementById("viewGridBtn");
+const viewHeatBtn = document.getElementById("viewHeatBtn");
+viewGridBtn.onclick = () => setViewMode("grid");
+viewHeatBtn.onclick = () => setViewMode("heat");
+
+function setViewMode(mode) {
+  viewMode = mode;
+  viewGridBtn.classList.toggle("active", mode === "grid");
+  viewHeatBtn.classList.toggle("active", mode === "heat");
+  bandwidthGroup.style.display = mode === "heat" ? "block" : "none";
+  metricGroupTitle.textContent = mode === "heat" ? "Heatmap weight" : "Zone colour";
+  legendGrad.classList.toggle("grid", mode === "grid");
+  legendGrad.classList.toggle("heat", mode === "heat");
+  aboutGrid.style.display = mode === "grid" ? "block" : "none";
+  aboutHeat.style.display = mode === "heat" ? "block" : "none";
+  buildMetricButtons();
+  render();
+}
+
+// --- Metrics: grid mode has 4 (incl. conversion %), heatmap mode has 3 ---
+const metricsGrid = [
   { key: "shots", label: "Shots", format: v => String(v) },
   { key: "xg", label: "Total xG", format: v => v.toFixed(2) },
   { key: "goals", label: "Goals", format: v => String(v) },
-  { key: "conversion", label: "Conversion %", format: v => v === null ? "—" : Math.round(v) + "%" },
+  { key: "conversion", label: "Conversion %", format: v => v === null ? "\u2014" : Math.round(v) + "%" },
 ];
-let activeMetric = "shots";
+const metricsHeat = [
+  { key: "shots", label: "Shots" },
+  { key: "xg", label: "Total xG" },
+  { key: "goals", label: "Goals only" },
+];
+let activeMetricGrid = "shots";
+let activeMetricHeat = "shots";
+
+function currentMetrics() { return viewMode === "grid" ? metricsGrid : metricsHeat; }
+function activeMetricKey() { return viewMode === "grid" ? activeMetricGrid : activeMetricHeat; }
+function setActiveMetric(key) {
+  if (viewMode === "grid") activeMetricGrid = key; else activeMetricHeat = key;
+}
 
 function buildMetricButtons() {
   metricButtonsEl.innerHTML = "";
-  metrics.forEach(m => {
+  currentMetrics().forEach(m => {
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = "metric-btn" + (m.key === activeMetric ? " active" : "");
+    btn.className = "metric-btn" + (m.key === activeMetricKey() ? " active" : "");
     btn.textContent = m.label;
     btn.onclick = () => {
-      activeMetric = m.key;
+      setActiveMetric(m.key);
       [...metricButtonsEl.children].forEach(c => c.classList.remove("active"));
       btn.classList.add("active");
       render();
@@ -486,6 +561,10 @@ document.getElementById("outcomeNoneBtn").onclick = () => {
   render();
 };
 document.getElementById("showDots").addEventListener("change", render);
+bandwidthSlider.addEventListener("input", () => {
+  bandwidthValue.textContent = bandwidthSlider.value;
+  render();
+});
 teamFilter.addEventListener("change", () => { rebuildPlayerChips(); render(); });
 
 function getFiltered() {
@@ -501,10 +580,12 @@ function getFiltered() {
   });
 }
 
-// --- Zone definitions: 3 depth bands x 3 width channels = 9 zones ---
-// Depth (x, 0-35 realistic shot distance): six-yard box / penalty area / edge of box
-// Width (y, 0-100 pitch width): left / central / right channel
+// --- Coordinate mapping (shared) ---
 const VIEW_MAX_X = 35;
+function pxFromY(y) { return 10 + (y / 100) * 380; }
+function pyFromX(x) { return 10 + (Math.min(x, VIEW_MAX_X) / VIEW_MAX_X) * 280; }
+
+// --- Zone grid definitions: 3 depth bands x 3 width channels = 9 zones ---
 const depthBands = [
   { key: "six", label: "Six-yard box", xMin: 0, xMax: 6 },
   { key: "pen", label: "Penalty area", xMin: 6, xMax: 18 },
@@ -541,13 +622,9 @@ function computeZones(filtered) {
   return zones;
 }
 
-function pxFromY(y) { return 10 + (y / 100) * 380; }
-function pyFromX(x) { return 10 + (Math.min(x, VIEW_MAX_X) / VIEW_MAX_X) * 280; }
-
 function zoneColor(value, maxValue) {
   if (value === null || maxValue === 0) return "rgba(255,255,255,0.05)";
   const t = Math.max(0, Math.min(1, value / maxValue));
-  // interpolate between pale cream and site red
   const c1 = [253, 241, 232], c2 = [200, 16, 46];
   const r = Math.round(c1[0] + (c2[0] - c1[0]) * t);
   const g = Math.round(c1[1] + (c2[1] - c1[1]) * t);
@@ -556,18 +633,14 @@ function zoneColor(value, maxValue) {
   return `rgba(${r},${g},${b},${alpha.toFixed(2)})`;
 }
 
-let zoneChartInstance = null;
-
-function render() {
-  updateMatchLabel();
-  const filtered = getFiltered();
+function renderGrid(filtered) {
+  heatCanvas.style.display = "none";
   const zones = computeZones(filtered);
-  const metric = metrics.find(m => m.key === activeMetric);
+  const metric = metricsGrid.find(m => m.key === activeMetricGrid);
 
-  const values = Object.values(zones).map(z => z[activeMetric]).filter(v => v !== null);
+  const values = Object.values(zones).map(z => z[activeMetricGrid]).filter(v => v !== null);
   const maxValue = values.length ? Math.max(...values) : 0;
 
-  // draw zone cells
   const cellsGroup = document.getElementById("zoneCells");
   const labelsGroup = document.getElementById("zoneLabels");
   cellsGroup.innerHTML = "";
@@ -582,7 +655,7 @@ function render() {
       rect.setAttribute("y", y0.toFixed(1));
       rect.setAttribute("width", (x1 - x0).toFixed(1));
       rect.setAttribute("height", (y1 - y0).toFixed(1));
-      rect.setAttribute("fill", zoneColor(z[activeMetric], maxValue));
+      rect.setAttribute("fill", zoneColor(z[activeMetricGrid], maxValue));
       rect.setAttribute("stroke", "rgba(255,255,255,0.25)");
       rect.setAttribute("stroke-width", "0.6");
       rect.classList.add("zone-cell");
@@ -597,61 +670,26 @@ function render() {
         valText.setAttribute("y", ((y0 + y1) / 2 + 4).toFixed(1));
         valText.setAttribute("text-anchor", "middle");
         valText.classList.add("zone-value");
-        valText.textContent = metric.format(z[activeMetric]);
+        valText.textContent = metric.format(z[activeMetricGrid]);
         labelsGroup.appendChild(valText);
       }
     });
   });
 
-  // optional individual shot markers
-  const dotsGroup = document.getElementById("shotDots");
-  dotsGroup.innerHTML = "";
-  if (document.getElementById("showDots").checked) {
-    filtered.forEach(s => {
-      const px = pxFromY(s.y);
-      const py = pyFromX(s.x);
-      const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-      c.setAttribute("cx", px.toFixed(1)); c.setAttribute("cy", py.toFixed(1)); c.setAttribute("r", "2.6");
-      c.classList.add("shot-dot-ghost");
-      const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
-      title.textContent = `${s.player} (${s.minute}') \u2014 ${s.outcome}, xG ${s.xg.toFixed(2)}`;
-      c.appendChild(title);
-      dotsGroup.appendChild(c);
-    });
-  }
-
   document.getElementById("metricCaption").textContent = `Colour \u0026 values: ${metric.label}`;
 
-  // stat cards (whole filtered set, not per-zone)
-  const totalShots = filtered.length;
-  const totalXg = filtered.reduce((a, s) => a + s.xg, 0);
-  const goals = filtered.filter(s => s.outcome === "Goal").length;
-  const conv = totalShots > 0 ? Math.round((goals / totalShots) * 100) : 0;
-  const statsData = [
-    { label: "Shots", value: totalShots }, { label: "Total xG", value: totalXg.toFixed(2) },
-    { label: "Goals", value: goals }, { label: "Conversion", value: totalShots > 0 ? conv + "%" : "—" },
-  ];
-  const statCards = document.getElementById("statCards");
-  statCards.innerHTML = "";
-  statsData.forEach(s => {
-    const div = document.createElement("div"); div.className = "stat-card";
-    div.innerHTML = `<div class="label">${s.label}</div><div class="value">${s.value}</div>`;
-    statCards.appendChild(div);
-  });
-
-  // zone breakdown chart
   document.getElementById("breakdownTitle").textContent = `Zone breakdown \u2014 ${metric.label}`;
   const zoneList = [];
   widthBands.forEach(w => {
     depthBands.forEach(d => {
       const z = zones[`${d.key}_${w.key}`];
-      zoneList.push({ label: `${w.label} \u00b7 ${d.label}`, value: z[activeMetric] === null ? 0 : z[activeMetric] });
+      zoneList.push({ label: `${w.label} \u00b7 ${d.label}`, value: z[activeMetricGrid] === null ? 0 : z[activeMetricGrid] });
     });
   });
   zoneList.sort((a, b) => b.value - a.value);
 
-  if (zoneChartInstance) zoneChartInstance.destroy();
-  zoneChartInstance = new Chart(document.getElementById("zoneChart"), {
+  if (breakdownChartInstance) breakdownChartInstance.destroy();
+  breakdownChartInstance = new Chart(document.getElementById("breakdownChart"), {
     type: "bar",
     data: {
       labels: zoneList.map(z => z.label),
@@ -662,10 +700,166 @@ function render() {
       responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false } },
       scales: {
-        x: { beginAtZero: true, ticks: { callback: v => activeMetric === "conversion" ? v + "%" : v } },
+        x: { beginAtZero: true, ticks: { callback: v => activeMetricGrid === "conversion" ? v + "%" : v } },
         y: { ticks: { font: { size: 11 } } }
       }
     }
+  });
+}
+
+// --- Smoothed heatmap (kernel density via soft radial blobs + gradient LUT) ---
+const BUF_SCALE = 2;
+let circleTemplateCache = {};
+function getCircleTemplate(radiusPx) {
+  const key = Math.round(radiusPx);
+  if (circleTemplateCache[key]) return circleTemplateCache[key];
+  const size = key * 2;
+  const c = document.createElement("canvas");
+  c.width = size; c.height = size;
+  const ctx = c.getContext("2d");
+  const grad = ctx.createRadialGradient(key, key, 0, key, key, key);
+  grad.addColorStop(0, "rgba(0,0,0,1)");
+  grad.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, size, size);
+  circleTemplateCache[key] = c;
+  return c;
+}
+
+const gradientLUT = (() => {
+  const stops = [
+    { t: 0.00, r: 253, g: 241, b: 232, a: 0 },
+    { t: 0.12, r: 253, g: 241, b: 232, a: 70 },
+    { t: 0.45, r: 232, g: 120, b: 90,  a: 190 },
+    { t: 1.00, r: 200, g: 16,  b: 46,  a: 255 },
+  ];
+  const lut = new Uint8ClampedArray(256 * 4);
+  for (let i = 0; i < 256; i++) {
+    const t = i / 255;
+    let s0 = stops[0], s1 = stops[stops.length - 1];
+    for (let k = 0; k < stops.length - 1; k++) {
+      if (t >= stops[k].t && t <= stops[k + 1].t) { s0 = stops[k]; s1 = stops[k + 1]; break; }
+    }
+    const span = (s1.t - s0.t) || 1;
+    const f = (t - s0.t) / span;
+    lut[i * 4 + 0] = s0.r + (s1.r - s0.r) * f;
+    lut[i * 4 + 1] = s0.g + (s1.g - s0.g) * f;
+    lut[i * 4 + 2] = s0.b + (s1.b - s0.b) * f;
+    lut[i * 4 + 3] = s0.a + (s1.a - s0.a) * f;
+  }
+  return lut;
+})();
+
+function pointWeight(s, metric) {
+  if (metric === "goals") return s.outcome === "Goal" ? 1 : 0;
+  if (metric === "xg") return Math.min(s.xg / 0.5, 1);
+  return 1;
+}
+
+function renderHeat(filtered) {
+  heatCanvas.style.display = "block";
+  document.getElementById("zoneCells").innerHTML = "";
+  document.getElementById("zoneLabels").innerHTML = "";
+
+  const metric = metricsHeat.find(m => m.key === activeMetricHeat);
+  const radius = parseInt(bandwidthSlider.value, 10);
+
+  const w = heatCanvas.width, h = heatCanvas.height;
+  heatCtx.clearRect(0, 0, w, h);
+  const radiusPx = Math.max(4, radius * BUF_SCALE);
+  const template = getCircleTemplate(radiusPx);
+  const baseAlpha = activeMetricHeat === "goals" ? 0.6 : 0.35;
+
+  heatCtx.globalCompositeOperation = "source-over";
+  filtered.forEach(s => {
+    const weight = pointWeight(s, activeMetricHeat);
+    if (weight <= 0) return;
+    const bx = pxFromY(s.y) * BUF_SCALE;
+    const by = pyFromX(s.x) * BUF_SCALE;
+    heatCtx.globalAlpha = Math.min(1, baseAlpha * weight);
+    heatCtx.drawImage(template, bx - radiusPx, by - radiusPx, radiusPx * 2, radiusPx * 2);
+  });
+  heatCtx.globalAlpha = 1;
+
+  const img = heatCtx.getImageData(0, 0, w, h);
+  const data = img.data;
+  for (let i = 0; i < data.length; i += 4) {
+    const a = data[i + 3];
+    if (a === 0) continue;
+    const li = a * 4;
+    data[i] = gradientLUT[li];
+    data[i + 1] = gradientLUT[li + 1];
+    data[i + 2] = gradientLUT[li + 2];
+    data[i + 3] = gradientLUT[li + 3];
+  }
+  heatCtx.putImageData(img, 0, 0);
+
+  document.getElementById("metricCaption").textContent = `Weighted by: ${metric.label} \u00b7 radius ${radius}`;
+
+  document.getElementById("breakdownTitle").textContent = "Shots by distance from goal";
+  const bands = [
+    { label: "Six-yard box", xMin: 0, xMax: 6 },
+    { label: "Penalty area", xMin: 6, xMax: 18 },
+    { label: "Edge of box", xMin: 18, xMax: VIEW_MAX_X },
+  ];
+  const bandCounts = bands.map(b => filtered.filter(s => {
+    const x = Math.min(s.x, VIEW_MAX_X);
+    return x >= b.xMin && x < b.xMax;
+  }).length);
+
+  if (breakdownChartInstance) breakdownChartInstance.destroy();
+  breakdownChartInstance = new Chart(document.getElementById("breakdownChart"), {
+    type: "bar",
+    data: { labels: bands.map(b => b.label), datasets: [{ label: "Shots", data: bandCounts, backgroundColor: "#c8102e", borderRadius: 3 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+    }
+  });
+}
+
+let breakdownChartInstance = null;
+
+function render() {
+  updateMatchLabel();
+  const filtered = getFiltered();
+
+  if (viewMode === "grid") renderGrid(filtered);
+  else renderHeat(filtered);
+
+  // optional individual shot markers (shared between both views)
+  const dotsGroup = document.getElementById("shotDots");
+  dotsGroup.innerHTML = "";
+  if (document.getElementById("showDots").checked) {
+    filtered.forEach(s => {
+      const px = pxFromY(s.y);
+      const py = pyFromX(s.x);
+      const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      c.setAttribute("cx", px.toFixed(1)); c.setAttribute("cy", py.toFixed(1)); c.setAttribute("r", "2.4");
+      c.classList.add("shot-dot-ghost");
+      const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+      title.textContent = `${s.player} (${s.minute}') \u2014 ${s.outcome}, xG ${s.xg.toFixed(2)}`;
+      c.appendChild(title);
+      dotsGroup.appendChild(c);
+    });
+  }
+
+  // stat cards (shared)
+  const totalShots = filtered.length;
+  const totalXg = filtered.reduce((a, s) => a + s.xg, 0);
+  const goals = filtered.filter(s => s.outcome === "Goal").length;
+  const conv = totalShots > 0 ? Math.round((goals / totalShots) * 100) : 0;
+  const statsData = [
+    { label: "Shots", value: totalShots }, { label: "Total xG", value: totalXg.toFixed(2) },
+    { label: "Goals", value: goals }, { label: "Conversion", value: totalShots > 0 ? conv + "%" : "\u2014" },
+  ];
+  const statCards = document.getElementById("statCards");
+  statCards.innerHTML = "";
+  statsData.forEach(s => {
+    const div = document.createElement("div"); div.className = "stat-card";
+    div.innerHTML = `<div class="label">${s.label}</div><div class="value">${s.value}</div>`;
+    statCards.appendChild(div);
   });
 }
 
