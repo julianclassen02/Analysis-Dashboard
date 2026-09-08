@@ -74,6 +74,46 @@
   .red-card-box { width:14px; height:19px; border-radius:2px; background:var(--red-dark); border:1.5px solid #6d0819; display:inline-block; }
   .red-card-count { font-family:'Helvetica Neue',Arial,sans-serif; font-size:13px; font-weight:600; color:var(--red-dark); }
   .ban-note { color:var(--muted); font-weight:400; }
+
+  .board-toolbar { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px; font-family:'Helvetica Neue',Arial,sans-serif; }
+  .pos-filter { display:flex; gap:8px; flex-wrap:wrap; }
+  .pos-chip { font-size:12px; padding:6px 13px; border-radius:999px; border:1px solid var(--line); background:var(--panel); cursor:pointer; color:var(--muted); user-select:none; }
+  .pos-chip.active { background:#fbe9ec; border-color:var(--red); color:var(--ink); font-weight:600; }
+  .sort-note { font-size:11.5px; color:var(--muted); }
+
+  .tile-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(210px, 1fr)); gap:14px; }
+  .player-tile { position:relative; background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:14px 14px 12px; cursor:pointer; transition:box-shadow .15s ease, opacity .15s ease; }
+  .player-tile:hover { box-shadow:0 3px 10px rgba(0,0,0,0.08); }
+  .player-tile.zero-cards { opacity:0.55; }
+  .player-tile.zero-cards:hover { opacity:0.9; }
+  .player-tile.expanded { grid-column: span 2; }
+  @media (max-width:520px) { .player-tile.expanded { grid-column: span 1; } }
+
+  .tile-top { display:flex; align-items:center; gap:12px; }
+  .ring-wrap { position:relative; width:60px; height:60px; flex-shrink:0; }
+  .ring-wrap svg { transform:rotate(-90deg); }
+  .ring-count { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:Georgia,serif; font-size:15px; color:var(--ink); }
+  .tile-name-block { min-width:0; }
+  .tile-name { font-family:'Helvetica Neue',Arial,sans-serif; font-weight:600; font-size:13.5px; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .tile-pos { font-family:'Helvetica Neue',Arial,sans-serif; font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; }
+
+  .tile-status-line { font-family:'Helvetica Neue',Arial,sans-serif; font-size:11.5px; margin-top:10px; line-height:1.4; }
+  .tile-status-line.status-clear { color:var(--muted); }
+  .tile-status-line.status-watch { color:#8a5a10; font-weight:600; }
+  .tile-status-line.status-danger { color:var(--red-dark); font-weight:600; }
+
+  .red-badge-inline { display:inline-flex; align-items:center; gap:6px; background:var(--red-dark); color:#fff; border-radius:3px; padding:4px 9px; font-family:'Helvetica Neue',Arial,sans-serif; font-size:11.5px; font-weight:600; margin-bottom:10px; }
+
+  .tile-caret { position:absolute; bottom:8px; right:10px; font-size:10px; color:var(--muted); font-family:'Helvetica Neue',Arial,sans-serif; }
+
+  .tile-detail { margin-top:14px; padding-top:12px; border-top:1px solid var(--line); font-family:'Helvetica Neue',Arial,sans-serif; }
+  .tile-detail-title { font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:8px; }
+  .timeline-row { display:flex; gap:6px; flex-wrap:wrap; }
+  .timeline-dot { width:26px; height:26px; border-radius:5px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:600; border:1.5px solid var(--line); color:var(--muted); background:var(--paper); flex-shrink:0; }
+  .timeline-dot.yellow { background:#e0a634; border-color:#b9821f; color:#3a2c05; }
+  .timeline-dot.red { background:var(--red-dark); border-color:#6d0819; color:#fff; }
+  .timeline-dot.dnp { background:transparent; border-style:dashed; color:var(--line); }
+  .timeline-legend { margin-top:8px; font-size:11px; color:var(--muted); }
 </style>
 </head>
 <body>
@@ -107,17 +147,8 @@
   <div class="stats-row" id="statCards"></div>
 
   <div class="panel">
-    <h2>Fouls and yellow cards</h2>
-    <div class="desc">Team-level totals — this data is complete and reliable for every match.</div>
-    <div class="chart-holder"><canvas id="teamChart"></canvas></div>
-  </div>
-
-  <div class="panel">
     <h2>Yellow and red cards</h2>
     <div class="desc">2026/27 National League South only.</div>
-    <div class="placeholder-flag">
-      Per-player yellow and red cards are now fully reconciled against team-level totals for every match played this season (MD01–MD07). The MD03 and MD06 gaps noted earlier have since been backfilled in the master tracker.
-    </div>
     <div class="threshold-block">
       <div class="threshold-title">Suspension thresholds — National League South, 2026/27</div>
       <div class="threshold-grid">
@@ -131,21 +162,21 @@
         </div>
         <div class="threshold-item">
           <span class="threshold-count">15 yellows</span>
-          <span class="threshold-desc">3-match ban if reached by MD46 (season's last match)</span>
+          <span class="threshold-desc">3-match ban if reached by MD46</span>
         </div>
       </div>
     </div>
-    <table id="cardTable">
-      <thead>
-        <tr>
-          <th>Player</th>
-          <th>Yellow cards</th>
-          <th>Status</th>
-          <th>Red cards</th>
-        </tr>
-      </thead>
-      <tbody id="cardTableBody"></tbody>
-    </table>
+    <div class="board-toolbar">
+      <div class="pos-filter" id="posFilter"></div>
+      <div class="sort-note">Sorted by yellow cards, most first &middot; click a tile for match-by-match history</div>
+    </div>
+    <div class="tile-grid" id="tileGrid"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Fouls and yellow cards</h2>
+    <div class="desc">Team-level totals — this data is complete and reliable for every match.</div>
+    <div class="chart-holder"><canvas id="teamChart"></canvas></div>
   </div>
 
   <footer>Created by Julian Classen, for internal use only. Data from Sofascore.</footer>
@@ -241,7 +272,7 @@ function cardStatus(y) {
         else if (away === 2) level = "watch";
       }
       const label = isActive
-        ? `${away} away from suspension <span class="ban-note">(${t.ban}-match ban at ${t.count})</span>`
+        ? `${away} away from suspension`
         : `${t.count}-card window closed <span class="ban-note">(${t.cutoffLabel} passed)</span>`;
       return { label, level };
     }
@@ -261,22 +292,803 @@ function cardBoxesHtml(y) {
   return `<div class="card-boxes">${boxes}</div>`;
 }
 
-const cardTableBody = document.getElementById("cardTableBody");
-squad
-  .slice()
-  .sort((a, b) => b.leagueYellows - a.leagueYellows)
-  .forEach(p => {
-    const status = cardStatus(p.leagueYellows);
-    const tr = document.createElement("tr");
-    if (p.leagueYellows === 0 && p.redCards === 0) tr.className = "zero-cards";
-    tr.innerHTML = `
-      <td><div class="player-name">${p.name}</div></td>
-      <td>${cardBoxesHtml(p.leagueYellows)}</td>
-      <td class="status-${status.level}">${status.label}</td>
-      <td>${p.redCards > 0 ? `<div class="red-card-cell"><span class="red-card-box"></span><span class="red-card-count">x${p.redCards}</span></div>` : ""}</td>
-    `;
-    cardTableBody.appendChild(tr);
+const cardHistory = {
+ "Jayden Mitchell-Lawson": [
+  {
+   "md": "MD01",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD02",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD03",
+   "minutes": 71.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD05",
+   "minutes": 9.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD06",
+   "minutes": 74.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD07",
+   "minutes": 75.0,
+   "yellow": 1,
+   "red": 0
+  }
+ ],
+ "Jordan Ragguette": [
+  {
+   "md": "MD01",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD02",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD03",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD04",
+   "minutes": 63.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD05",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD06",
+   "minutes": 90.0,
+   "yellow": 1,
+   "red": 0
+  },
+  {
+   "md": "MD07",
+   "minutes": 80.0,
+   "yellow": 0,
+   "red": 0
+  }
+ ],
+ "Josh Coley": [
+  {
+   "md": "MD01",
+   "minutes": 77.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD02",
+   "minutes": 87.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD03",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD04",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD05",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD06",
+   "minutes": 34.0,
+   "yellow": 0,
+   "red": 1
+  },
+  {
+   "md": "MD07",
+   "minutes": 90.0,
+   "yellow": 1,
+   "red": 0
+  }
+ ],
+ "Joshua Johnson": [
+  {
+   "md": "MD01",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD03",
+   "minutes": 85.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD04",
+   "minutes": 75.0,
+   "yellow": 1,
+   "red": 0
+  },
+  {
+   "md": "MD05",
+   "minutes": 7.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD06",
+   "minutes": 87.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD07",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  }
+ ],
+ "Alfie Pendlebury": [
+  {
+   "md": "MD01",
+   "minutes": 44.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD02",
+   "minutes": 64.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD03",
+   "minutes": 14.0,
+   "yellow": 1,
+   "red": 0
+  },
+  {
+   "md": "MD04",
+   "minutes": 23.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD05",
+   "minutes": 4.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD06",
+   "minutes": 78.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD07",
+   "minutes": 1.0,
+   "yellow": 0,
+   "red": 0
+  }
+ ],
+ "Joel Odeniran": [
+  {
+   "md": "MD01",
+   "minutes": 44.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD02",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD03",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD04",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD05",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD06",
+   "minutes": 44.0,
+   "yellow": 0,
+   "red": 0
+  }
+ ],
+ "Matthew Achuba": [
+  {
+   "md": "MD01",
+   "minutes": 19.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD02",
+   "minutes": 90.0,
+   "yellow": 1,
+   "red": 0
+  },
+  {
+   "md": "MD03",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD04",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD05",
+   "minutes": 41.0,
+   "yellow": 0,
+   "red": 1
+  },
+  {
+   "md": "MD06",
+   "minutes": 30.0,
+   "yellow": 0,
+   "red": 0
+  }
+ ],
+ "Remy Clerima": [
+  {
+   "md": "MD01",
+   "minutes": 90.0,
+   "yellow": 1,
+   "red": 0
+  },
+  {
+   "md": "MD02",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD03",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD04",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD05",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD06",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD07",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  }
+ ],
+ "Christian N'Guessan": [
+  {
+   "md": "MD01",
+   "minutes": 71.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD02",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD04",
+   "minutes": 23.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD05",
+   "minutes": 86.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD06",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD07",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  }
+ ],
+ "Daniel Nkrumah": [
+  {
+   "md": "MD01",
+   "minutes": 5.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD02",
+   "minutes": 12.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD03",
+   "minutes": 85.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD04",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD05",
+   "minutes": 81.0,
+   "yellow": 1,
+   "red": 0
+  },
+  {
+   "md": "MD07",
+   "minutes": 12.0,
+   "yellow": 0,
+   "red": 0
+  }
+ ],
+ "Jordi van Stappershoef": [
+  {
+   "md": "MD01",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD02",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD03",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD04",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD05",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD06",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD07",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  }
+ ],
+ "Miles Welch-Hayes": [
+  {
+   "md": "MD01",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD03",
+   "minutes": 14.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD06",
+   "minutes": 46.0,
+   "yellow": 1,
+   "red": 0
+  }
+ ],
+ "Connor Hall": [
+  {
+   "md": "MD01",
+   "minutes": 13.0,
+   "yellow": 1,
+   "red": 0
+  },
+  {
+   "md": "MD06",
+   "minutes": 60.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD07",
+   "minutes": 78.0,
+   "yellow": 0,
+   "red": 0
+  }
+ ],
+ "George Abbott": [
+  {
+   "md": "MD01",
+   "minutes": 46.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD02",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD03",
+   "minutes": 71.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD04",
+   "minutes": 68.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD05",
+   "minutes": 83.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD07",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  }
+ ],
+ "Finley Welch": [
+  {
+   "md": "MD01",
+   "minutes": 46.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD02",
+   "minutes": 35.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD03",
+   "minutes": 29.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD04",
+   "minutes": 35.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD05",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD06",
+   "minutes": 16.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD07",
+   "minutes": 15.0,
+   "yellow": 0,
+   "red": 0
+  }
+ ],
+ "Josh Umerah": [
+  {
+   "md": "MD01",
+   "minutes": 85.0,
+   "yellow": 1,
+   "red": 0
+  },
+  {
+   "md": "MD02",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD03",
+   "minutes": 90.0,
+   "yellow": 1,
+   "red": 0
+  },
+  {
+   "md": "MD04",
+   "minutes": 75.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD05",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD06",
+   "minutes": 12.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD07",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  }
+ ],
+ "Manny Onariase": [
+  {
+   "md": "MD02",
+   "minutes": 6.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD03",
+   "minutes": 29.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD04",
+   "minutes": 30.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD06",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD07",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  }
+ ],
+ "Owen Cochrane": [
+  {
+   "md": "MD03",
+   "minutes": 9.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD04",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD06",
+   "minutes": 3.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD07",
+   "minutes": 10.0,
+   "yellow": 0,
+   "red": 0
+  }
+ ],
+ "Jadyn Dundas": [
+  {
+   "md": "MD07",
+   "minutes": 1.0,
+   "yellow": 0,
+   "red": 0
+  }
+ ]
+};
+
+// --- Card-based tile board ---
+const RING_R = 24;
+const RING_CIRC = 2 * Math.PI * RING_R;
+const levelColor = { clear: "#9b9587", watch: "#e0a634", danger: "#c8102e" };
+
+function ringSvg(filled, level) {
+  const frac = filled / 5;
+  const dash = (frac * RING_CIRC).toFixed(1);
+  const color = levelColor[level] || levelColor.clear;
+  return `
+    <svg width="60" height="60" viewBox="0 0 60 60">
+      <circle cx="30" cy="30" r="${RING_R}" fill="none" stroke="#e3ddce" stroke-width="6"/>
+      <circle cx="30" cy="30" r="${RING_R}" fill="none" stroke="${color}" stroke-width="6"
+        stroke-dasharray="${dash} ${RING_CIRC.toFixed(1)}" stroke-linecap="round"/>
+    </svg>`;
+}
+
+function timelineHtml(name, redCards) {
+  const hist = cardHistory[name] || [];
+  const byMd = {};
+  hist.forEach(h => byMd[h.md] = h);
+  const dots = discTeam.map(m => {
+    const h = byMd[m.md];
+    let cls = "dnp", label = "DNP";
+    if (h) {
+      if (h.red > 0) { cls = "red"; label = "R"; }
+      else if (h.yellow > 0) { cls = "yellow"; label = "Y"; }
+      else { cls = ""; label = ""; }
+    }
+    const title = h
+      ? `${m.md} vs ${shortOpp(m.opponent)} \u2014 ${h.minutes}' played${h.yellow ? ", yellow card" : ""}${h.red ? ", red card" : ""}`
+      : `${m.md} vs ${shortOpp(m.opponent)} \u2014 did not play`;
+    return `<div class="timeline-dot ${cls}" title="${title}">${label}</div>`;
+  }).join("");
+  return `
+    <div class="tile-detail">
+      <div class="timeline-row">${dots}</div>
+      <div class="timeline-legend">Y = yellow card &middot; R = red card &middot; DNP = did not play</div>
+    </div>`;
+}
+
+function shortOpp(name) {
+  return name.replace(/^AFC\s+/, "").replace(/\s+(City|Town|Wanderers|United|Rovers|County|Athletic)$/i, "");
+}
+
+const posLabelDisc = { G: "GK", D: "DEF", M: "MID", F: "FWD" };
+const posFilterState = { All: true, G: false, D: false, M: false, F: false };
+const expandedTiles = new Set();
+
+function buildPosFilter() {
+  const el = document.getElementById("posFilter");
+  const options = ["All", "G", "D", "M", "F"];
+  el.innerHTML = "";
+  options.forEach(opt => {
+    const chip = document.createElement("div");
+    chip.className = "pos-chip" + (posFilterState[opt] ? " active" : "");
+    chip.textContent = opt === "All" ? "All" : posLabelDisc[opt];
+    chip.onclick = () => {
+      Object.keys(posFilterState).forEach(k => posFilterState[k] = false);
+      posFilterState[opt] = true;
+      buildPosFilter();
+      renderBoard();
+    };
+    el.appendChild(chip);
   });
+}
+
+function renderBoard() {
+  const grid = document.getElementById("tileGrid");
+  grid.innerHTML = "";
+  const activePos = Object.keys(posFilterState).find(k => posFilterState[k]) || "All";
+
+  squad
+    .slice()
+    .filter(p => activePos === "All" || p.pos === activePos)
+    .sort((a, b) => b.leagueYellows - a.leagueYellows)
+    .forEach(p => {
+      const status = cardStatus(p.leagueYellows);
+      const bandLower = Math.floor(p.leagueYellows / 5) * 5;
+      const filled = p.leagueYellows - bandLower;
+      const isZero = p.leagueYellows === 0 && p.redCards === 0;
+      const isExpanded = expandedTiles.has(p.name);
+      // Ring colour reflects card count directly: grey at 0, amber from the first yellow,
+      // escalating to red only once actually close to a suspension threshold.
+      const ringLevel = p.leagueYellows === 0 ? "clear" : (status.level === "danger" ? "danger" : "watch");
+
+      const tile = document.createElement("div");
+      tile.className = "player-tile" + (isZero ? " zero-cards" : "") + (isExpanded ? " expanded" : "");
+      tile.innerHTML = `
+        <div class="tile-top">
+          <div class="ring-wrap">
+            ${ringSvg(filled, ringLevel)}
+            <div class="ring-count">${p.leagueYellows}</div>
+          </div>
+          <div class="tile-name-block">
+            <div class="tile-name">${p.name}</div>
+            <div class="tile-pos">${posLabelDisc[p.pos] || p.pos}</div>
+          </div>
+        </div>
+        <div class="tile-status-line status-${status.level}">${status.label}</div>
+        <div class="tile-caret">${isExpanded ? "&#9650; hide" : "&#9660; history"}</div>
+        ${isExpanded ? timelineHtml(p.name, p.redCards) : ""}
+      `;
+      tile.addEventListener("click", () => {
+        if (expandedTiles.has(p.name)) expandedTiles.delete(p.name);
+        else expandedTiles.add(p.name);
+        renderBoard();
+      });
+      grid.appendChild(tile);
+    });
+}
+
+buildPosFilter();
+renderBoard();
 </script>
 </body>
 </html>
