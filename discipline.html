@@ -184,7 +184,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-const discTeam = [{"md": "MD01", "opponent": "Truro City", "date": "2026-08-08", "foulsFor": 11, "foulsAgainst": 13, "yellowFor": 3, "redFor": 0}, {"md": "MD02", "opponent": "Dorking Wanderers", "date": "2026-08-15", "foulsFor": 15, "foulsAgainst": 16, "yellowFor": 1, "redFor": 0}, {"md": "MD03", "opponent": "Hemel Hempstead Town", "date": "2026-08-18", "foulsFor": 14, "foulsAgainst": 13, "yellowFor": 2, "redFor": 0}, {"md": "MD04", "opponent": "Farnborough", "date": "2026-08-22", "foulsFor": 8, "foulsAgainst": 15, "yellowFor": 1, "redFor": 0}, {"md": "MD05", "opponent": "Chelmsford City", "date": "2026-08-29", "foulsFor": 14, "foulsAgainst": 13, "yellowFor": 1, "redFor": 1}, {"md": "MD06", "opponent": "AFC Totton", "date": "2026-08-31", "foulsFor": 12, "foulsAgainst": 21, "yellowFor": 2, "redFor": 1}, {"md": "MD07", "opponent": "Dover Athletic", "date": "2026-09-05", "foulsFor": 16, "foulsAgainst": 10, "yellowFor": 2, "redFor": 0}];
+const discTeam = [{"md": "MD01", "opponent": "Truro City", "date": "2026-08-08", "foulsFor": 11, "foulsAgainst": 13, "yellowFor": 3, "redFor": 0}, {"md": "MD02", "opponent": "Dorking Wanderers", "date": "2026-08-15", "foulsFor": 15, "foulsAgainst": 16, "yellowFor": 1, "redFor": 0}, {"md": "MD03", "opponent": "Hemel Hempstead Town", "date": "2026-08-18", "foulsFor": 14, "foulsAgainst": 13, "yellowFor": 2, "redFor": 0}, {"md": "MD04", "opponent": "Farnborough", "date": "2026-08-22", "foulsFor": 8, "foulsAgainst": 15, "yellowFor": 1, "redFor": 0}, {"md": "MD05", "opponent": "Chelmsford City", "date": "2026-08-29", "foulsFor": 14, "foulsAgainst": 13, "yellowFor": 1, "redFor": 1}, {"md": "MD06", "opponent": "AFC Totton", "date": "2026-08-31", "foulsFor": 12, "foulsAgainst": 21, "yellowFor": 2, "redFor": 1}, {"md": "MD07", "opponent": "Dover Athletic", "date": "2026-09-05", "foulsFor": 16, "foulsAgainst": 10, "yellowFor": 2, "redFor": 0}, {"md": "MD08", "opponent": "Torquay United", "date": "2026-09-08", "foulsFor": 6, "foulsAgainst": 17, "yellowFor": 3, "redFor": 2}];
 const totalFouls = discTeam.reduce((a,d)=>a+d.foulsFor,0);
 const totalYellow = discTeam.reduce((a,d)=>a+d.yellowFor,0);
 const totalRed = discTeam.reduce((a,d)=>a+d.redFor,0);
@@ -228,10 +228,10 @@ new Chart(document.getElementById("teamChart"), {
 // seven matches fully reconciled, no known gaps as of this update).
 const squad = [
   { name: "Jordi van Stappershoef", pos: "G", leagueYellows: 0, redCards: 0, cupYellows: 0 },
-  { name: "Jordan Ragguette", pos: "D", leagueYellows: 1, redCards: 0, cupYellows: 0 },
-  { name: "Remy Clerima", pos: "D", leagueYellows: 1, redCards: 0, cupYellows: 0 },
+  { name: "Jordan Ragguette", pos: "D", leagueYellows: 1, redCards: 1, cupYellows: 0 },
+  { name: "Remy Clerima", pos: "D", leagueYellows: 2, redCards: 0, cupYellows: 0 },
   { name: "Joel Odeniran", pos: "D", leagueYellows: 0, redCards: 0, cupYellows: 0 },
-  { name: "George Abbott", pos: "D", leagueYellows: 0, redCards: 0, cupYellows: 0 },
+  { name: "George Abbott", pos: "D", leagueYellows: 2, redCards: 1, cupYellows: 0 },
   { name: "Manny Onariase", pos: "D", leagueYellows: 0, redCards: 0, cupYellows: 0 },
   { name: "Miles Welch-Hayes", pos: "D", leagueYellows: 1, redCards: 0, cupYellows: 0 },
   { name: "Matthew Achuba", pos: "M", leagueYellows: 1, redCards: 1, cupYellows: 0 },
@@ -249,8 +249,8 @@ const squad = [
 
 // Suspension logic — thresholds are cumulative league-only totals, each gated by a match-number/date cutoff.
 // current match number / date used to evaluate whether a threshold's cutoff has passed.
-const CURRENT_MD = 7;               // update as the season progresses
-const CURRENT_DATE = new Date("2026-09-05");
+const CURRENT_MD = 8;               // update as the season progresses
+const CURRENT_DATE = new Date("2026-09-08");
 const DEC31_2026 = new Date("2026-12-31");
 
 // Each threshold's ban only triggers within its own cutoff window; "away" counts down to whichever
@@ -329,6 +329,12 @@ const cardHistory = {
    "minutes": 75.0,
    "yellow": 1,
    "red": 0
+  },
+  {
+   "md": "MD08",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
   }
  ],
  "Jordan Ragguette": [
@@ -373,6 +379,12 @@ const cardHistory = {
    "minutes": 80.0,
    "yellow": 0,
    "red": 0
+  },
+  {
+   "md": "MD08",
+   "minutes": 12.0,
+   "yellow": 0,
+   "red": 1
   }
  ],
  "Josh Coley": [
@@ -455,6 +467,12 @@ const cardHistory = {
    "minutes": 90.0,
    "yellow": 0,
    "red": 0
+  },
+  {
+   "md": "MD08",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
   }
  ],
  "Alfie Pendlebury": [
@@ -499,6 +517,12 @@ const cardHistory = {
    "minutes": 1.0,
    "yellow": 0,
    "red": 0
+  },
+  {
+   "md": "MD08",
+   "minutes": 18.0,
+   "yellow": 0,
+   "red": 0
   }
  ],
  "Joel Odeniran": [
@@ -535,6 +559,12 @@ const cardHistory = {
   {
    "md": "MD06",
    "minutes": 44.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD08",
+   "minutes": 24.0,
    "yellow": 0,
    "red": 0
   }
@@ -619,6 +649,12 @@ const cardHistory = {
    "minutes": 90.0,
    "yellow": 0,
    "red": 0
+  },
+  {
+   "md": "MD08",
+   "minutes": 90.0,
+   "yellow": 1,
+   "red": 0
   }
  ],
  "Christian N'Guessan": [
@@ -654,6 +690,12 @@ const cardHistory = {
   },
   {
    "md": "MD07",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD08",
    "minutes": 90.0,
    "yellow": 0,
    "red": 0
@@ -693,6 +735,12 @@ const cardHistory = {
   {
    "md": "MD07",
    "minutes": 12.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD08",
+   "minutes": 90.0,
    "yellow": 0,
    "red": 0
   }
@@ -736,6 +784,12 @@ const cardHistory = {
   },
   {
    "md": "MD07",
+   "minutes": 90.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD08",
    "minutes": 90.0,
    "yellow": 0,
    "red": 0
@@ -817,6 +871,12 @@ const cardHistory = {
    "minutes": 90.0,
    "yellow": 0,
    "red": 0
+  },
+  {
+   "md": "MD08",
+   "minutes": 46.0,
+   "yellow": 2,
+   "red": 1
   }
  ],
  "Finley Welch": [
@@ -859,6 +919,12 @@ const cardHistory = {
   {
    "md": "MD07",
    "minutes": 15.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD08",
+   "minutes": 48.0,
    "yellow": 0,
    "red": 0
   }
@@ -905,6 +971,12 @@ const cardHistory = {
    "minutes": 90.0,
    "yellow": 0,
    "red": 0
+  },
+  {
+   "md": "MD08",
+   "minutes": 72.0,
+   "yellow": 0,
+   "red": 0
   }
  ],
  "Manny Onariase": [
@@ -937,6 +1009,12 @@ const cardHistory = {
    "minutes": 90.0,
    "yellow": 0,
    "red": 0
+  },
+  {
+   "md": "MD08",
+   "minutes": 66.0,
+   "yellow": 0,
+   "red": 0
   }
  ],
  "Owen Cochrane": [
@@ -961,6 +1039,12 @@ const cardHistory = {
   {
    "md": "MD07",
    "minutes": 10.0,
+   "yellow": 0,
+   "red": 0
+  },
+  {
+   "md": "MD08",
+   "minutes": 42.0,
    "yellow": 0,
    "red": 0
   }

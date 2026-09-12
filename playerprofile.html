@@ -155,6 +155,7 @@ const squad = [
   { name: "Alfie Pendlebury", pos: "F" },
   { name: "Daniel Nkrumah", pos: "F" },
   { name: "Connor Hall", pos: "F" },
+  { name: "Jadyn Dundas", pos: "M" },
 ];
 
 const posLabel = { G: "Goalkeeper", D: "Defender", M: "Midfielder", F: "Forward" };
@@ -183,59 +184,59 @@ const radarTemplates = {
 };
 
 // --- Computed player data (Sofascore extraction, 26/27 season) ---
-// Source: Julian-supplied CSV export of the "Player stats 26/27" tab, MD01-MD07 complete
-// (107 rows). Appearance counts vary by player because of rotation/subs, not missing data.
-// Exception: Key_Passes for MD07 is flagged in the Data Quality Log as an extraction miss
-// (all players show 0, inconsistent with every prior matchday) — "Chance creation" below
-// is therefore computed from MD01-06 only, per player, and MD07 is excluded from that one
-// metric specifically. Every other metric uses the full MD01-07 sample.
+// Source: Julian-supplied CSV export of the "Player stats 26/27" tab, MD01-MD08 complete
+// (121 rows). Appearance counts vary by player because of rotation/subs, not missing data.
+// Exception: Key_Passes for MD07 is still flagged in the Data Quality Log as an extraction
+// miss (all players show 0, inconsistent with every other matchday including MD08) —
+// "Chance creation" below is therefore computed from MD01-06 + MD08, per player, and MD07
+// is excluded from that one metric specifically. Every other metric uses the full MD01-08 sample.
 // "Last 5 matches" currently draws on the same full-season sample as "Full season" — not
 // yet split by recency, since 7 matchdays isn't enough to make that distinction meaningful.
 const radarValues = {
   "Jordan Ragguette": {
-    "Duels won": 58.0,
+    "Duels won": 56.9,
     "Aerial duels": 50.0,
     "Defensive actions": 0.0,
-    "Passing": 60.7,
+    "Passing": 61.0,
     "Progression": null,
     "Physical output": null
   },
   "Remy Clerima": {
-    "Duels won": 73.7,
-    "Aerial duels": 78.6,
-    "Defensive actions": 100.0,
-    "Passing": 79.3,
+    "Duels won": 73.0,
+    "Aerial duels": 78.4,
+    "Defensive actions": 80.7,
+    "Passing": 79.4,
     "Progression": null,
     "Physical output": null
   },
   "Joel Odeniran": {
-    "Duels won": 61.1,
-    "Aerial duels": 69.2,
-    "Defensive actions": 99.8,
-    "Passing": 73.4,
+    "Duels won": 60.8,
+    "Aerial duels": 70.0,
+    "Defensive actions": 100.0,
+    "Passing": 72.7,
     "Progression": null,
     "Physical output": null
   },
   "George Abbott": {
-    "Duels won": 65.0,
-    "Aerial duels": 80.8,
-    "Defensive actions": 38.4,
-    "Passing": 75.7,
+    "Duels won": 61.2,
+    "Aerial duels": 81.5,
+    "Defensive actions": 37.1,
+    "Passing": 75.9,
     "Progression": null,
     "Physical output": null
   },
   "Manny Onariase": {
-    "Duels won": 76.9,
-    "Aerial duels": 88.2,
-    "Defensive actions": 17.5,
-    "Passing": 80.2,
+    "Duels won": 72.7,
+    "Aerial duels": 85.7,
+    "Defensive actions": 28.3,
+    "Passing": 80.0,
     "Progression": null,
     "Physical output": null
   },
   "Miles Welch-Hayes": {
     "Duels won": 50.0,
     "Aerial duels": 33.3,
-    "Defensive actions": 11.4,
+    "Defensive actions": 10.4,
     "Passing": 68.6,
     "Progression": null,
     "Physical output": null
@@ -244,80 +245,80 @@ const radarValues = {
     "Passing": 84.0,
     "Progression": null,
     "Duels won": 62.5,
-    "Defensive actions": 51.0,
-    "Chance creation": 56.8,
+    "Defensive actions": 64.6,
+    "Chance creation": 80.6,
     "Physical output": null
   },
   "Christian N'Guessan": {
-    "Passing": 87.8,
+    "Passing": 86.5,
     "Progression": null,
-    "Duels won": 66.0,
-    "Defensive actions": 67.1,
-    "Chance creation": 28.4,
+    "Duels won": 64.2,
+    "Defensive actions": 73.3,
+    "Chance creation": 32.3,
     "Physical output": null
   },
   "Joshua Johnson": {
-    "Passing": 79.9,
+    "Passing": 78.6,
     "Progression": null,
-    "Duels won": 43.3,
+    "Duels won": 46.2,
     "Defensive actions": 0.0,
     "Chance creation": 0.0,
     "Physical output": null
   },
   "Owen Cochrane": {
-    "Passing": 65.8,
+    "Passing": 72.2,
     "Progression": null,
-    "Duels won": 46.2,
+    "Duels won": 47.1,
     "Defensive actions": 100.0,
     "Chance creation": 100.0,
     "Physical output": null
   },
   "Finley Welch": {
-    "Passing": 81.1,
+    "Passing": 81.0,
     "Progression": null,
-    "Duels won": 41.5,
-    "Defensive actions": 25.0,
+    "Duels won": 38.1,
+    "Defensive actions": 13.8,
     "Chance creation": 0.0,
     "Physical output": null
   },
   "Jayden Mitchell-Lawson": {
     "Shooting (xG)": 0.0,
-    "Chance creation": 87.7,
+    "Chance creation": 68.8,
     "Take-ons": 100.0,
-    "Aerial / hold-up": 28.6,
-    "Defensive work": 99.1,
+    "Aerial / hold-up": 33.3,
+    "Defensive work": 98.5,
     "Physical output": null
   },
   "Josh Coley": {
     "Shooting (xG)": 100.0,
     "Chance creation": 100.0,
-    "Take-ons": 63.6,
+    "Take-ons": 72.7,
     "Aerial / hold-up": 23.8,
-    "Defensive work": 79.8,
+    "Defensive work": 92.9,
     "Physical output": null
   },
   "Josh Umerah": {
-    "Shooting (xG)": 42.1,
-    "Chance creation": 79.2,
-    "Take-ons": 5.2,
-    "Aerial / hold-up": 27.8,
-    "Defensive work": 100.0,
+    "Shooting (xG)": 35.0,
+    "Chance creation": 68.2,
+    "Take-ons": 10.4,
+    "Aerial / hold-up": 31.7,
+    "Defensive work": 98.5,
     "Physical output": null
   },
   "Alfie Pendlebury": {
-    "Shooting (xG)": 36.8,
-    "Chance creation": 51.3,
-    "Take-ons": 11.8,
+    "Shooting (xG)": 40.0,
+    "Chance creation": 47.4,
+    "Take-ons": 12.8,
     "Aerial / hold-up": 31.6,
-    "Defensive work": 94.7,
+    "Defensive work": 100.0,
     "Physical output": null
   },
   "Daniel Nkrumah": {
-    "Shooting (xG)": 31.6,
-    "Chance creation": 85.7,
-    "Take-ons": 28.8,
-    "Aerial / hold-up": 6.2,
-    "Defensive work": 1.3,
+    "Shooting (xG)": 15.0,
+    "Chance creation": 80.5,
+    "Take-ons": 41.5,
+    "Aerial / hold-up": 5.3,
+    "Defensive work": 6.1,
     "Physical output": null
   },
   "Connor Hall": {
@@ -330,44 +331,45 @@ const radarValues = {
   },
   "Jordi van Stappershoef": {
     "Shot-stopping": null,
-    "Distribution": 71.1,
+    "Distribution": 67.1,
     "Aerial claims": null,
     "Sweeping / off-line": null,
     "Command of box": null,
     "Physical output": null
-  }
+  },
+  "Jadyn Dundas": {"Passing": 100.0, "Progression": null, "Duels won": 0.0, "Defensive actions": null, "Chance creation": null, "Physical output": null}
 };
 
 const metricDisplay = {
   "Jordan Ragguette": {
-    "Duels won": 58.0,
+    "Duels won": 56.9,
     "Aerial duels": 50.0,
-    "Defensive actions": 7.28,
-    "Passing": 60.7
+    "Defensive actions": 7.29,
+    "Passing": 61.0
   },
   "Remy Clerima": {
-    "Duels won": 73.7,
-    "Aerial duels": 78.6,
-    "Defensive actions": 11.86,
-    "Passing": 79.3
+    "Duels won": 73.0,
+    "Aerial duels": 78.4,
+    "Defensive actions": 11.25,
+    "Passing": 79.4
   },
   "Joel Odeniran": {
-    "Duels won": 61.1,
-    "Aerial duels": 69.2,
-    "Defensive actions": 11.85,
-    "Passing": 73.4
+    "Duels won": 60.8,
+    "Aerial duels": 70.0,
+    "Defensive actions": 12.2,
+    "Passing": 72.7
   },
   "George Abbott": {
-    "Duels won": 65.0,
-    "Aerial duels": 80.8,
-    "Defensive actions": 9.04,
-    "Passing": 75.7
+    "Duels won": 61.2,
+    "Aerial duels": 81.5,
+    "Defensive actions": 9.11,
+    "Passing": 75.9
   },
   "Manny Onariase": {
-    "Duels won": 76.9,
-    "Aerial duels": 88.2,
-    "Defensive actions": 8.08,
-    "Passing": 80.2
+    "Duels won": 72.7,
+    "Aerial duels": 85.7,
+    "Defensive actions": 8.68,
+    "Passing": 80.0
   },
   "Miles Welch-Hayes": {
     "Duels won": 50.0,
@@ -382,35 +384,35 @@ const metricDisplay = {
     "Chance creation": 0.5
   },
   "Christian N'Guessan": {
-    "Passing": 87.8,
-    "Duels won": 66.0,
-    "Defensive actions": 5.4,
-    "Chance creation": 0.25
+    "Passing": 86.5,
+    "Duels won": 64.2,
+    "Defensive actions": 4.83,
+    "Chance creation": 0.2
   },
   "Joshua Johnson": {
-    "Passing": 79.9,
-    "Duels won": 43.3,
-    "Defensive actions": 1.66,
+    "Passing": 78.6,
+    "Duels won": 46.2,
+    "Defensive actions": 2.06,
     "Chance creation": 0.0
   },
   "Owen Cochrane": {
-    "Passing": 65.8,
-    "Duels won": 46.2,
-    "Defensive actions": 7.23,
-    "Chance creation": 0.88
+    "Passing": 72.2,
+    "Duels won": 47.1,
+    "Defensive actions": 5.84,
+    "Chance creation": 0.62
   },
   "Finley Welch": {
-    "Passing": 81.1,
-    "Duels won": 41.5,
-    "Defensive actions": 3.05,
+    "Passing": 81.0,
+    "Duels won": 38.1,
+    "Defensive actions": 2.58,
     "Chance creation": 0.0
   },
   "Jayden Mitchell-Lawson": {
-    "Shooting (xG)": 0.14,
-    "Chance creation": 1.35,
-    "Take-ons": 3.3,
-    "Aerial / hold-up": 28.6,
-    "Defensive work": 2.86
+    "Shooting (xG)": 0.13,
+    "Chance creation": 1.06,
+    "Take-ons": 2.89,
+    "Aerial / hold-up": 33.3,
+    "Defensive work": 2.53
   },
   "Josh Coley": {
     "Shooting (xG)": 0.33,
@@ -420,25 +422,25 @@ const metricDisplay = {
     "Defensive work": 2.42
   },
   "Josh Umerah": {
-    "Shooting (xG)": 0.22,
-    "Chance creation": 1.22,
-    "Take-ons": 0.17,
-    "Aerial / hold-up": 27.8,
-    "Defensive work": 2.88
+    "Shooting (xG)": 0.2,
+    "Chance creation": 1.05,
+    "Take-ons": 0.3,
+    "Aerial / hold-up": 31.7,
+    "Defensive work": 2.53
   },
   "Alfie Pendlebury": {
     "Shooting (xG)": 0.21,
-    "Chance creation": 0.79,
-    "Take-ons": 0.39,
+    "Chance creation": 0.73,
+    "Take-ons": 0.37,
     "Aerial / hold-up": 31.6,
-    "Defensive work": 2.76
+    "Defensive work": 2.56
   },
   "Daniel Nkrumah": {
-    "Shooting (xG)": 0.2,
-    "Chance creation": 1.32,
-    "Take-ons": 0.95,
-    "Aerial / hold-up": 6.2,
-    "Defensive work": 0.63
+    "Shooting (xG)": 0.16,
+    "Chance creation": 1.24,
+    "Take-ons": 1.2,
+    "Aerial / hold-up": 5.3,
+    "Defensive work": 0.72
   },
   "Connor Hall": {
     "Shooting (xG)": 0.33,
@@ -449,28 +451,29 @@ const metricDisplay = {
   },
   "Jordi van Stappershoef": {
     "Distribution": null
-  }
+  },
+  "Jadyn Dundas": {"Passing": 100.0, "Duels won": 0.0, "Defensive actions": 0.0, "Chance creation": 0.0}
 };
 
 const playerBio = {
-  "Jordi van Stappershoef": {
+  "Jayden Mitchell-Lawson": {
     "apps": 7,
-    "mins": 630,
+    "mins": 499,
     "mds": [
       "MD01",
       "MD02",
       "MD03",
-      "MD04",
       "MD05",
       "MD06",
-      "MD07"
+      "MD07",
+      "MD08"
     ],
-    "pass_pct": 81.7,
-    "longball_pct": 60.5
+    "pass_pct": 73.8,
+    "longball_pct": 37.5
   },
   "Jordan Ragguette": {
-    "apps": 7,
-    "mins": 593,
+    "apps": 8,
+    "mins": 605,
     "mds": [
       "MD01",
       "MD02",
@@ -478,160 +481,11 @@ const playerBio = {
       "MD04",
       "MD05",
       "MD06",
-      "MD07"
+      "MD07",
+      "MD08"
     ],
-    "pass_pct": 60.7,
+    "pass_pct": 61.0,
     "longball_pct": 36.8
-  },
-  "Remy Clerima": {
-    "apps": 7,
-    "mins": 630,
-    "mds": [
-      "MD01",
-      "MD02",
-      "MD03",
-      "MD04",
-      "MD05",
-      "MD06",
-      "MD07"
-    ],
-    "pass_pct": 79.3,
-    "longball_pct": 46.9
-  },
-  "Joel Odeniran": {
-    "apps": 6,
-    "mins": 448,
-    "mds": [
-      "MD01",
-      "MD02",
-      "MD03",
-      "MD04",
-      "MD05",
-      "MD06"
-    ],
-    "pass_pct": 73.4,
-    "longball_pct": 54.3
-  },
-  "George Abbott": {
-    "apps": 6,
-    "mins": 448,
-    "mds": [
-      "MD01",
-      "MD02",
-      "MD03",
-      "MD04",
-      "MD05",
-      "MD07"
-    ],
-    "pass_pct": 75.7,
-    "longball_pct": 45.0
-  },
-  "Manny Onariase": {
-    "apps": 5,
-    "mins": 245,
-    "mds": [
-      "MD02",
-      "MD03",
-      "MD04",
-      "MD06",
-      "MD07"
-    ],
-    "pass_pct": 80.2,
-    "longball_pct": 44.4
-  },
-  "Miles Welch-Hayes": {
-    "apps": 3,
-    "mins": 150,
-    "mds": [
-      "MD01",
-      "MD03",
-      "MD06"
-    ],
-    "pass_pct": 68.6,
-    "longball_pct": 50.0
-  },
-  "Matthew Achuba": {
-    "apps": 6,
-    "mins": 360,
-    "mds": [
-      "MD01",
-      "MD02",
-      "MD03",
-      "MD04",
-      "MD05",
-      "MD06"
-    ],
-    "pass_pct": 84.0,
-    "longball_pct": 12.5
-  },
-  "Christian N'Guessan": {
-    "apps": 6,
-    "mins": 450,
-    "mds": [
-      "MD01",
-      "MD02",
-      "MD04",
-      "MD05",
-      "MD06",
-      "MD07"
-    ],
-    "pass_pct": 87.8,
-    "longball_pct": 28.6
-  },
-  "Joshua Johnson": {
-    "apps": 6,
-    "mins": 434,
-    "mds": [
-      "MD01",
-      "MD03",
-      "MD04",
-      "MD05",
-      "MD06",
-      "MD07"
-    ],
-    "pass_pct": 79.9,
-    "longball_pct": 66.7
-  },
-  "Owen Cochrane": {
-    "apps": 4,
-    "mins": 112,
-    "mds": [
-      "MD03",
-      "MD04",
-      "MD06",
-      "MD07"
-    ],
-    "pass_pct": 65.8,
-    "longball_pct": 33.3
-  },
-  "Finley Welch": {
-    "apps": 7,
-    "mins": 266,
-    "mds": [
-      "MD01",
-      "MD02",
-      "MD03",
-      "MD04",
-      "MD05",
-      "MD06",
-      "MD07"
-    ],
-    "pass_pct": 81.1,
-    "longball_pct": 20.0
-  },
-  "Jayden Mitchell-Lawson": {
-    "apps": 6,
-    "mins": 409,
-    "mds": [
-      "MD01",
-      "MD02",
-      "MD03",
-      "MD05",
-      "MD06",
-      "MD07"
-    ],
-    "pass_pct": 75.3,
-    "longball_pct": 50.0
   },
   "Josh Coley": {
     "apps": 7,
@@ -648,24 +502,24 @@ const playerBio = {
     "pass_pct": 69.4,
     "longball_pct": 22.7
   },
-  "Josh Umerah": {
+  "Joshua Johnson": {
     "apps": 7,
-    "mins": 532,
+    "mins": 524,
     "mds": [
       "MD01",
-      "MD02",
       "MD03",
       "MD04",
       "MD05",
       "MD06",
-      "MD07"
+      "MD07",
+      "MD08"
     ],
-    "pass_pct": 81.5,
-    "longball_pct": 75.0
+    "pass_pct": 78.6,
+    "longball_pct": 66.7
   },
   "Alfie Pendlebury": {
-    "apps": 7,
-    "mins": 228,
+    "apps": 8,
+    "mins": 246,
     "mds": [
       "MD01",
       "MD02",
@@ -673,24 +527,113 @@ const playerBio = {
       "MD04",
       "MD05",
       "MD06",
-      "MD07"
+      "MD07",
+      "MD08"
     ],
-    "pass_pct": 61.8,
+    "pass_pct": 59.0,
     "longball_pct": 100.0
   },
-  "Daniel Nkrumah": {
-    "apps": 6,
-    "mins": 285,
+  "Joel Odeniran": {
+    "apps": 7,
+    "mins": 472,
     "mds": [
       "MD01",
       "MD02",
       "MD03",
       "MD04",
       "MD05",
-      "MD07"
+      "MD06",
+      "MD08"
     ],
-    "pass_pct": 78.0,
-    "longball_pct": null
+    "pass_pct": 72.7,
+    "longball_pct": 52.8
+  },
+  "Matthew Achuba": {
+    "apps": 6,
+    "mins": 360,
+    "mds": [
+      "MD01",
+      "MD02",
+      "MD03",
+      "MD04",
+      "MD05",
+      "MD06"
+    ],
+    "pass_pct": 84.0,
+    "longball_pct": 12.5
+  },
+  "Remy Clerima": {
+    "apps": 8,
+    "mins": 720,
+    "mds": [
+      "MD01",
+      "MD02",
+      "MD03",
+      "MD04",
+      "MD05",
+      "MD06",
+      "MD07",
+      "MD08"
+    ],
+    "pass_pct": 79.4,
+    "longball_pct": 45.7
+  },
+  "Christian N'Guessan": {
+    "apps": 7,
+    "mins": 540,
+    "mds": [
+      "MD01",
+      "MD02",
+      "MD04",
+      "MD05",
+      "MD06",
+      "MD07",
+      "MD08"
+    ],
+    "pass_pct": 86.5,
+    "longball_pct": 37.5
+  },
+  "Daniel Nkrumah": {
+    "apps": 7,
+    "mins": 375,
+    "mds": [
+      "MD01",
+      "MD02",
+      "MD03",
+      "MD04",
+      "MD05",
+      "MD07",
+      "MD08"
+    ],
+    "pass_pct": 77.4,
+    "longball_pct": 100.0
+  },
+  "Jordi van Stappershoef": {
+    "apps": 8,
+    "mins": 720,
+    "mds": [
+      "MD01",
+      "MD02",
+      "MD03",
+      "MD04",
+      "MD05",
+      "MD06",
+      "MD07",
+      "MD08"
+    ],
+    "pass_pct": 78.3,
+    "longball_pct": 55.9
+  },
+  "Miles Welch-Hayes": {
+    "apps": 3,
+    "mins": 150,
+    "mds": [
+      "MD01",
+      "MD03",
+      "MD06"
+    ],
+    "pass_pct": 68.6,
+    "longball_pct": 50.0
   },
   "Connor Hall": {
     "apps": 3,
@@ -702,6 +645,89 @@ const playerBio = {
     ],
     "pass_pct": 66.7,
     "longball_pct": 100.0
+  },
+  "George Abbott": {
+    "apps": 7,
+    "mins": 494,
+    "mds": [
+      "MD01",
+      "MD02",
+      "MD03",
+      "MD04",
+      "MD05",
+      "MD07",
+      "MD08"
+    ],
+    "pass_pct": 75.9,
+    "longball_pct": 44.2
+  },
+  "Finley Welch": {
+    "apps": 8,
+    "mins": 314,
+    "mds": [
+      "MD01",
+      "MD02",
+      "MD03",
+      "MD04",
+      "MD05",
+      "MD06",
+      "MD07",
+      "MD08"
+    ],
+    "pass_pct": 81.0,
+    "longball_pct": 33.3
+  },
+  "Josh Umerah": {
+    "apps": 8,
+    "mins": 604,
+    "mds": [
+      "MD01",
+      "MD02",
+      "MD03",
+      "MD04",
+      "MD05",
+      "MD06",
+      "MD07",
+      "MD08"
+    ],
+    "pass_pct": 77.4,
+    "longball_pct": 75.0
+  },
+  "Manny Onariase": {
+    "apps": 6,
+    "mins": 311,
+    "mds": [
+      "MD02",
+      "MD03",
+      "MD04",
+      "MD06",
+      "MD07",
+      "MD08"
+    ],
+    "pass_pct": 80.0,
+    "longball_pct": 36.4
+  },
+  "Owen Cochrane": {
+    "apps": 5,
+    "mins": 154,
+    "mds": [
+      "MD03",
+      "MD04",
+      "MD06",
+      "MD07",
+      "MD08"
+    ],
+    "pass_pct": 72.2,
+    "longball_pct": 33.3
+  },
+  "Jadyn Dundas": {
+    "apps": 1,
+    "mins": 1,
+    "mds": [
+      "MD07"
+    ],
+    "pass_pct": 100.0,
+    "longball_pct": 0.0
   }
 };
 
