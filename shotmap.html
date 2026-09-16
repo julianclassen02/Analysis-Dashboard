@@ -64,12 +64,15 @@
 
   .center-col { min-width: 0; }
   .pitch-frame { background:var(--panel); border:1px solid var(--line); border-radius:4px; padding:16px; position:relative; }
-  .pitch-video-overlay { display:none; position:absolute; inset:0; z-index:30; background:#0b0b0b; border:3px solid var(--red); border-radius:8px; box-shadow:0 12px 32px rgba(0,0,0,0.4); }
-  .pitch-video-overlay.open { display:block; }
-  .pitch-video-inner { position:absolute; inset:8px; border-radius:4px; overflow:hidden; background:#000; }
-  .pitch-video-inner iframe { position:absolute; inset:0; width:100%; height:100%; border:0; }
-  .pitch-video-close { position:absolute; top:14px; right:14px; z-index:31; width:32px; height:32px; border-radius:50%; background:rgba(20,17,15,0.75); color:#fff; border:2px solid #fff; font-size:19px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; font-family:'Helvetica Neue',Arial,sans-serif; }
+  .video-modal { display:none; position:fixed; inset:0; z-index:1000; align-items:center; justify-content:center; }
+  .video-modal.open { display:flex; }
+  .video-modal-backdrop { position:absolute; inset:0; background:rgba(20,17,15,0.62); }
+  .video-modal-panel { position:relative; width:min(94vw, 1000px); aspect-ratio:16/9; background:#0b0b0b; border:3px solid var(--red); border-radius:10px; overflow:hidden; box-shadow:0 28px 64px rgba(0,0,0,0.5), 0 6px 18px rgba(0,0,0,0.35); }
+  .video-modal-inner { position:absolute; inset:6px; border-radius:6px; overflow:hidden; background:#000; }
+  .video-modal-inner iframe { position:absolute; inset:0; width:100%; height:100%; border:0; }
+  .pitch-video-close { position:absolute; top:14px; right:14px; z-index:2; width:32px; height:32px; border-radius:50%; background:rgba(20,17,15,0.75); color:#fff; border:2px solid #fff; cursor:pointer; padding:0; display:flex; align-items:center; justify-content:center; }
   .pitch-video-close:hover { background:var(--red); }
+  .pitch-video-close svg { display:block; }
   svg#pitch { width:100%; height:auto; display:block; background:var(--pitch); border-radius:3px; }
   .legend { display:flex; gap:18px; flex-wrap:wrap; margin-top:12px; font-family:'Helvetica Neue',Arial,sans-serif; font-size:12px; color:var(--muted); }
   .legend .dot { width:9px; height:9px; border-radius:50%; display:inline-block; }
@@ -215,12 +218,6 @@
           <span><i class="dot" style="background:var(--neutral)"></i>Blocked / off target / woodwork</span>
           <span style="margin-left:auto;">Dot size = xG</span>
         </div>
-        <div class="pitch-video-overlay" id="pitchVideoOverlay">
-          <button type="button" class="pitch-video-close" id="pitchVideoClose" aria-label="Close video">&times;</button>
-          <div class="pitch-video-inner">
-            <iframe id="pitchVideoIframe" src="" title="Shot clip" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-at-origin" allowfullscreen></iframe>
-          </div>
-        </div>
       </div>
       <div class="stats-row" id="statCards"></div>
       <div class="breakdown">
@@ -239,6 +236,18 @@
       <div class="shot-list" id="shotList"></div>
     </div>
 
+  </div>
+
+  <div class="video-modal" id="pitchVideoOverlay">
+    <div class="video-modal-backdrop" id="pitchVideoBackdrop"></div>
+    <div class="video-modal-panel">
+      <button type="button" class="pitch-video-close" id="pitchVideoClose" aria-label="Close video">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="4" y1="4" x2="20" y2="20"/><line x1="20" y1="4" x2="4" y2="20"/></svg>
+      </button>
+      <div class="video-modal-inner">
+        <iframe id="pitchVideoIframe" src="" title="Shot clip" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-at-origin" allowfullscreen></iframe>
+      </div>
+    </div>
   </div>
 
   <footer>Created by Julian Classen, for internal use only. Data from Sofascore.</footer>
@@ -604,6 +613,7 @@ const shotDetailEl = document.getElementById("shotDetail");
 const pitchVideoOverlay = document.getElementById("pitchVideoOverlay");
 const pitchVideoIframe = document.getElementById("pitchVideoIframe");
 const pitchVideoClose = document.getElementById("pitchVideoClose");
+const pitchVideoBackdrop = document.getElementById("pitchVideoBackdrop");
 
 let pinnedShotId = null;   // stays selected after a click, survives re-renders
 let hoveredShotId = null;  // transient, takes priority over the pin while active
@@ -621,7 +631,8 @@ function findShot(id) {
 
 function openPitchVideo(s) {
   if (!s.video) return;
-  pitchVideoIframe.src = `https://www.youtube.com/embed/${s.video.videoId}?start=${s.video.start}&autoplay=1`;
+  const params = "autoplay=1&controls=0&modestbranding=1&rel=0&iv_load_policy=3&fs=0&disablekb=1";
+  pitchVideoIframe.src = `https://www.youtube.com/embed/${s.video.videoId}?start=${s.video.start}&${params}`;
   pitchVideoOverlay.classList.add("open");
 }
 function closePitchVideo() {
@@ -629,6 +640,7 @@ function closePitchVideo() {
   pitchVideoIframe.src = ""; // stop playback
 }
 pitchVideoClose.addEventListener("click", closePitchVideo);
+pitchVideoBackdrop.addEventListener("click", closePitchVideo);
 document.addEventListener("keydown", e => { if (e.key === "Escape") closePitchVideo(); });
 
 function renderShotDetail() {
