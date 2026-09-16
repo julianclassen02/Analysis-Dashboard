@@ -70,9 +70,12 @@
   .video-modal-panel { position:relative; width:min(94vw, 1000px); aspect-ratio:16/9; background:#0b0b0b; border:3px solid var(--red); border-radius:10px; overflow:hidden; box-shadow:0 28px 64px rgba(0,0,0,0.5), 0 6px 18px rgba(0,0,0,0.35); }
   .video-modal-inner { position:absolute; inset:6px; border-radius:6px; overflow:hidden; background:#000; }
   .video-modal-inner iframe { position:absolute; inset:0; width:100%; height:100%; border:0; }
-  .pitch-video-close { position:absolute; top:14px; right:14px; z-index:2; width:32px; height:32px; border-radius:50%; background:rgba(20,17,15,0.75); color:#fff; border:2px solid #fff; cursor:pointer; padding:0; display:flex; align-items:center; justify-content:center; }
-  .pitch-video-close:hover { background:var(--red); }
-  .pitch-video-close svg { display:block; }
+  .video-click-shield { position:absolute; inset:0; z-index:1; background:transparent; }
+  .pitch-video-close, .pitch-video-playpause { position:absolute; top:14px; z-index:2; width:32px; height:32px; border-radius:50%; background:rgba(20,17,15,0.75); color:#fff; border:2px solid #fff; cursor:pointer; padding:0; display:flex; align-items:center; justify-content:center; }
+  .pitch-video-close { right:14px; }
+  .pitch-video-playpause { left:14px; }
+  .pitch-video-close:hover, .pitch-video-playpause:hover { background:var(--red); }
+  .pitch-video-close svg, .pitch-video-playpause svg { display:block; }
   svg#pitch { width:100%; height:auto; display:block; background:var(--pitch); border-radius:3px; }
   .legend { display:flex; gap:18px; flex-wrap:wrap; margin-top:12px; font-family:'Helvetica Neue',Arial,sans-serif; font-size:12px; color:var(--muted); }
   .legend .dot { width:9px; height:9px; border-radius:50%; display:inline-block; }
@@ -241,11 +244,15 @@
   <div class="video-modal" id="pitchVideoOverlay">
     <div class="video-modal-backdrop" id="pitchVideoBackdrop"></div>
     <div class="video-modal-panel">
+      <button type="button" class="pitch-video-playpause" id="pitchVideoPlayPause" aria-label="Play/pause video">
+        <svg id="pitchVideoPlayPauseIcon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+      </button>
       <button type="button" class="pitch-video-close" id="pitchVideoClose" aria-label="Close video">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="4" y1="4" x2="20" y2="20"/><line x1="20" y1="4" x2="4" y2="20"/></svg>
       </button>
       <div class="video-modal-inner">
-        <iframe id="pitchVideoIframe" src="" title="Shot clip" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-at-origin" allowfullscreen></iframe>
+        <div id="pitchVideoIframe"></div>
+        <div class="video-click-shield"></div>
       </div>
     </div>
   </div>
@@ -611,9 +618,10 @@ const dotsGroupEl = document.getElementById("shotDots");
 const shotListEl = document.getElementById("shotList");
 const shotDetailEl = document.getElementById("shotDetail");
 const pitchVideoOverlay = document.getElementById("pitchVideoOverlay");
-const pitchVideoIframe = document.getElementById("pitchVideoIframe");
 const pitchVideoClose = document.getElementById("pitchVideoClose");
 const pitchVideoBackdrop = document.getElementById("pitchVideoBackdrop");
+const pitchVideoPlayPause = document.getElementById("pitchVideoPlayPause");
+const pitchVideoPlayPauseIcon = document.getElementById("pitchVideoPlayPauseIcon");
 
 let pinnedShotId = null;   // stays selected after a click, survives re-renders
 let hoveredShotId = null;  // transient, takes priority over the pin while active
@@ -629,16 +637,70 @@ function findShot(id) {
   return shots.find(s => String(s._id) === String(id));
 }
 
+// --- YouTube clip player, driven entirely by our own UI ---
+// controls=0 hides YouTube's own player chrome, and the click-shield over the
+// iframe stops native hover/click from ever reaching YouTube's player -- so its
+// laggy branded overlay never has a reason to appear. Play/pause instead goes
+// through the official IFrame API, driving our own always-instant button.
+const PAUSE_ICON = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+const PLAY_ICON = '<polygon points="7,4 20,12 7,20"/>';
+
+let ytPlayer = null;
+let ytApiPromise = null;
+
+function loadYouTubeAPI() {
+  if (window.YT && window.YT.Player) return Promise.resolve();
+  if (ytApiPromise) return ytApiPromise;
+  ytApiPromise = new Promise(resolve => {
+    window.onYouTubeIframeAPIReady = resolve;
+    const tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(tag);
+  });
+  return ytApiPromise;
+}
+
+function setPlayPauseIcon(isPlaying) {
+  pitchVideoPlayPauseIcon.innerHTML = isPlaying ? PAUSE_ICON : PLAY_ICON;
+}
+
+function onPlayerStateChange(e) {
+  if (e.data === YT.PlayerState.PLAYING) setPlayPauseIcon(true);
+  else if (e.data === YT.PlayerState.PAUSED || e.data === YT.PlayerState.ENDED) setPlayPauseIcon(false);
+}
+
 function openPitchVideo(s) {
   if (!s.video) return;
-  const params = "autoplay=1&controls=0&modestbranding=1&rel=0&iv_load_policy=3&fs=0&disablekb=1";
-  pitchVideoIframe.src = `https://www.youtube.com/embed/${s.video.videoId}?start=${s.video.start}&${params}`;
   pitchVideoOverlay.classList.add("open");
+  setPlayPauseIcon(true);
+  loadYouTubeAPI().then(() => {
+    const playerVars = {
+      start: s.video.start, autoplay: 1, controls: 0, modestbranding: 1,
+      rel: 0, iv_load_policy: 3, fs: 0, disablekb: 1, playsinline: 1
+    };
+    if (!ytPlayer) {
+      ytPlayer = new YT.Player("pitchVideoIframe", {
+        videoId: s.video.videoId,
+        playerVars,
+        events: {
+          onReady: e => e.target.playVideo(),
+          onStateChange: onPlayerStateChange
+        }
+      });
+    } else {
+      ytPlayer.loadVideoById({ videoId: s.video.videoId, startSeconds: s.video.start });
+    }
+  });
 }
 function closePitchVideo() {
   pitchVideoOverlay.classList.remove("open");
-  pitchVideoIframe.src = ""; // stop playback
+  if (ytPlayer && ytPlayer.stopVideo) ytPlayer.stopVideo();
 }
+pitchVideoPlayPause.addEventListener("click", () => {
+  if (!ytPlayer || !ytPlayer.getPlayerState) return;
+  if (ytPlayer.getPlayerState() === YT.PlayerState.PLAYING) ytPlayer.pauseVideo();
+  else ytPlayer.playVideo();
+});
 pitchVideoClose.addEventListener("click", closePitchVideo);
 pitchVideoBackdrop.addEventListener("click", closePitchVideo);
 document.addEventListener("keydown", e => { if (e.key === "Escape") closePitchVideo(); });
