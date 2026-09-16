@@ -696,14 +696,28 @@ function closePitchVideo() {
   pitchVideoOverlay.classList.remove("open");
   if (ytPlayer && ytPlayer.stopVideo) ytPlayer.stopVideo();
 }
-pitchVideoPlayPause.addEventListener("click", () => {
+function toggleClipPlayPause() {
   if (!ytPlayer || !ytPlayer.getPlayerState) return;
   if (ytPlayer.getPlayerState() === YT.PlayerState.PLAYING) ytPlayer.pauseVideo();
   else ytPlayer.playVideo();
-});
+}
+function seekClipBy(deltaSeconds) {
+  if (!ytPlayer || !ytPlayer.getCurrentTime) return;
+  ytPlayer.seekTo(Math.max(0, ytPlayer.getCurrentTime() + deltaSeconds), true);
+}
+pitchVideoPlayPause.addEventListener("click", toggleClipPlayPause);
 pitchVideoClose.addEventListener("click", closePitchVideo);
 pitchVideoBackdrop.addEventListener("click", closePitchVideo);
-document.addEventListener("keydown", e => { if (e.key === "Escape") closePitchVideo(); });
+
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") { closePitchVideo(); return; }
+  if (!pitchVideoOverlay.classList.contains("open")) return; // only act while the clip is open
+  const tag = (e.target.tagName || "").toLowerCase();
+  if (tag === "input" || tag === "select" || tag === "textarea" || e.target.isContentEditable) return; // don't hijack filters/typing
+  if (e.code === "Space") { e.preventDefault(); toggleClipPlayPause(); }
+  else if (e.code === "ArrowLeft") { e.preventDefault(); seekClipBy(-5); }
+  else if (e.code === "ArrowRight") { e.preventDefault(); seekClipBy(5); }
+});
 
 function renderShotDetail() {
   const id = hoveredShotId !== null ? hoveredShotId : pinnedShotId;
