@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maidenhead United — Team Comparison</title>
+<style>
+  :root {
+    --ink: #14110f; --paper: #f6f4ee; --panel: #ffffff;
+    --red: #c8102e; --red-dark: #8a0b20; --line: #e3ddce; --muted: #6f6a5c;
+    --blue: #2f6fb0;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family:'Georgia','Iowan Old Style',serif; -webkit-font-smoothing:antialiased; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 40px 24px 80px; }
+  header { display:flex; justify-content:space-between; align-items:flex-end; border-bottom:3px solid var(--ink); padding-bottom:18px; margin-bottom:12px; flex-wrap:wrap; gap:12px; }
+  header h1 { font-size:30px; margin:0; font-weight:400; letter-spacing:-0.01em; }
+  header .titlegroup { display:flex; align-items:center; }
+  header .sub { font-family:'Helvetica Neue',Arial,sans-serif; font-size:13px; color:var(--muted); }
+  nav { font-family:'Helvetica Neue',Arial,sans-serif; font-size:13px; margin-bottom:24px; }
+  nav a { color:var(--muted); text-decoration:none; margin-right:16px; }
+  nav a.active { color:var(--red); font-weight:600; border-bottom:2px solid var(--red); padding-bottom:4px; }
+  nav a:hover { color:var(--ink); }
+
+  .note { font-family:'Helvetica Neue',Arial,sans-serif; font-size:12px; color:var(--muted); background:#fbf6ec; border:1px solid var(--line); border-radius:4px; padding:12px 14px; margin-bottom:22px; line-height:1.5; }
+
+  .matchup { display:flex; align-items:center; justify-content:center; gap:18px; font-family:'Helvetica Neue',Arial,sans-serif; margin-bottom:22px; flex-wrap:wrap; }
+  .matchup .side { display:flex; align-items:center; gap:8px; font-size:15px; font-weight:600; }
+  .matchup .dot { width:11px; height:11px; border-radius:50%; flex-shrink:0; }
+  .matchup .vs { font-size:12px; color:var(--muted); font-style:italic; }
+  .matchup select { padding:7px 10px; font-size:13px; border:1px solid var(--line); border-radius:4px; background:var(--panel); color:var(--ink); font-family:inherit; font-weight:600; }
+  .matchup .n { font-size:11px; color:var(--muted); font-weight:400; }
+
+  .view-switch { display:flex; justify-content:center; margin-bottom:22px; font-family:'Helvetica Neue',Arial,sans-serif; }
+  .view-switch .pillbar { display:inline-flex; border:1px solid var(--line); border-radius:999px; padding:3px; background:var(--panel); }
+  .view-switch button { display:inline-block; padding:8px 18px; border-radius:999px; font-size:12.5px; font-weight:600; letter-spacing:.02em; border:none; background:none; cursor:pointer; color:var(--muted); font-family:inherit; }
+  .view-switch button.active { background:var(--red); color:#fff; }
+  .view-switch button:hover:not(.active) { color:var(--ink); }
+
+  .content { max-width: 1000px; margin: 0 auto; }
+
+  .radar-row { display:flex; gap:20px; flex-wrap:wrap; }
+  .chart-frame { flex:1; min-width:340px; background:var(--panel); border:1px solid var(--line); border-radius:4px; padding:20px; }
+  .chart-frame h2 { font-size:15px; font-weight:600; margin:0 0 12px; text-align:center; }
+  .chart-frame .canvas-wrap { position:relative; width:100%; height:400px; }
+
+  .explainer { font-family:'Helvetica Neue',Arial,sans-serif; font-size:12.5px; color:var(--muted); line-height:1.6; margin:24px auto 0; max-width:900px; }
+  .explainer strong { color:var(--ink); }
+
+  .table-wrap { margin-top:0; }
+  table.compare-table { width:100%; border-collapse:collapse; font-family:'Helvetica Neue',Arial,sans-serif; font-size:12.5px; background:var(--panel); border:1px solid var(--line); border-radius:4px; }
+  table.compare-table th, table.compare-table td { padding:8px 10px; text-align:right; border-bottom:1px solid var(--line); }
+  table.compare-table th:first-child, table.compare-table td:first-child { text-align:left; }
+  table.compare-table thead th { font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); font-weight:600; border-bottom:2px solid var(--ink); }
+  table.compare-table td.winner { font-weight:700; }
+  table.compare-table td.mufc-win { color:var(--red); }
+  table.compare-table td.opp-win { color:var(--blue); }
+
+  footer { margin-top:40px; padding-top:16px; border-top:1px solid var(--line); font-family:'Helvetica Neue',Arial,sans-serif; font-size:12px; color:var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="titlegroup">
+      <div>
+        <h1>Team comparison</h1>
+        <div class="sub">Maidenhead United — 2026/27 National League South</div>
+      </div>
+    </div>
+  </header>
+  <nav>
+    <a href="index.html">Overview</a>
+    <a href="shotmap.html">Shot map</a>
+    <a href="shotzones.html">Shot zones</a>
+    <a href="setpiece.html">Set pieces</a>
+    <a href="discipline.html">Discipline</a>
+    <a href="playercomparison.html">Player comparison</a>
+    <a href="teamcomparison.html" class="active">Team comparison</a>
+  </nav>
+
+  <div class="note">
+    <b>Team comparison.</b> Built from the (raw data) National League South 26/27 sheet plus Maidenhead's own raw data sheet — 22 clubs with data collected so far (7&ndash;8 matches each). Ebbsfleet United is excluded (5 of 8 matches postponed); Torquay United is excluded pending re-extraction, as their sheet tab currently duplicates Dorking Wanderers' rows. <b>Total tackles</b> is also left out of every view here: roughly 40% of matches league-wide show it recorded as exactly 0, almost certainly a Sofascore extraction gap rather than a real stat (the same issue already logged for 25/26), so it isn't trustworthy yet. Every metric below is a per-match rate or a completion percentage, so clubs with fewer games are still comparable.
+  </div>
+
+  <div class="matchup">
+    <div class="side"><span class="dot" style="background:var(--red)"></span>Maidenhead United <span class="n" id="mufcN"></span></div>
+    <div class="vs">vs</div>
+    <div class="side">
+      <span class="dot" style="background:var(--blue)"></span>
+      <select id="oppSelect"></select>
+      <span class="n" id="oppN"></span>
+    </div>
+  </div>
+
+  <div class="view-switch">
+    <div class="pillbar">
+      <button type="button" id="viewRadarBtn" class="active">Radar</button>
+      <button type="button" id="viewTableBtn">Table</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <div id="radarViews">
+      <div class="radar-row">
+        <div class="chart-frame">
+          <h2>Attacking</h2>
+          <div class="canvas-wrap"><canvas id="radarAtt"></canvas></div>
+        </div>
+        <div class="chart-frame">
+          <h2>Defensive</h2>
+          <div class="canvas-wrap"><canvas id="radarDef"></canvas></div>
+        </div>
+      </div>
+      <div class="explainer" id="radarExplainer">
+        <strong>Reading these:</strong> split into Attacking and Defensive rather than one combined radar, matching how professional team radars are usually built. Each axis is scaled 0&ndash;100 — percentages (possession, pass completion, duels won) plot as their literal value; counting stats (xG, shots, corners, interceptions, clearances) are scaled against the league's highest total this season; "conceded" stats (xG/shots/corners against) run the opposite way, so fewest conceded in the league scores 100. The dashed grey line is the league average for each stat. Goals are left out deliberately &mdash; over 7&ndash;8 matches they're a noisy outcome, so xG/shots/corners stand in as the underlying process. These describe playing <em>style</em>, not verified quality: nothing here adjusts for opponent strength, so treat the shapes as a picture of tendencies rather than a verdict on ability.
+      </div>
+    </div>
+
+    <div class="table-wrap" id="tableWrap" style="display:none;"></div>
+    <div class="explainer" id="tableExplainer" style="display:none;">
+      <strong>Reading this:</strong> every metric at once, with the higher figure in each row highlighted. Highlighting shows which side is higher, not which is "better" — for conceded metrics, lower is usually the favourable direction. Rates are per-match averages or completion percentages computed from all matches with data for that field; possession is the average of each match's possession share.
+    </div>
+
+  </div>
+
+  <footer>Created by Julian Classen, for internal use only. Data from Sofascore.</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+
+// Per-match rates / completion percentages, computed from the (raw data) National League
+// South 26/27 sheet (21 opponent tabs) and the (26/27) Maidenhead United raw data sheet.
+// Each club's match count differs (7-8) -- that's why every metric here is a rate, not a
+// season total. "_n" fields are the number of matches with usable data for that metric.
+// Total_tackles is excluded league-wide: ~40%% of matches show it as exactly 0, a known
+// Sofascore extraction gap (same issue already logged for the 25/26 tackles data).
+const teamData = {"Maidstone United":{"matches":8,"goals_for":2.0,"goals_for_n":8,"goals_against":0.88,"goals_against_n":8,"xg_for":2.09,"xg_for_n":8,"xg_against":1.38,"xg_against_n":8,"shots_for":12.62,"shots_for_n":8,"shots_against":10.25,"shots_against_n":8,"shots_on_target_for":5.88,"shots_on_target_for_n":8,"possession_pct":52.0,"possession_pct_n":8,"pass_completion_pct":76.61,"pass_completion_pct_n":8,"passes_attempted_for":403.5,"passes_attempted_for_n":8,"long_ball_pct":40.0,"long_ball_pct_n":8,"cross_completion_pct":27.56,"cross_completion_pct_n":8,"corners_for":5.88,"corners_for_n":8,"corners_against":4.62,"corners_against_n":8,"tackles_for":1.25,"tackles_for_n":4,"interceptions_for":17.62,"interceptions_for_n":8,"clearances_for":34.88,"clearances_for_n":8,"offsides_for":2.0,"offsides_for_n":8,"duels_win_pct":49.63,"duels_win_pct_n":8,"ground_duels_win_pct":52.19,"ground_duels_win_pct_n":8,"aerial_duels_win_pct":49.47,"aerial_duels_win_pct_n":8,"dribble_success_pct":66.67,"dribble_success_pct_n":8,"fouls_for":8.88,"fouls_for_n":8,"saves_for":3.0,"saves_for_n":8,"yellow_cards_for":1.0,"yellow_cards_for_n":8,"red_cards_for":0.0,"red_cards_for_n":8,"discipline_points_for":11.88,"discipline_points_for_n":8},"Weston Super Mare":{"matches":8,"goals_for":1.88,"goals_for_n":8,"goals_against":0.88,"goals_against_n":8,"xg_for":0.89,"xg_for_n":6,"xg_against":0.97,"xg_against_n":6,"shots_for":8.0,"shots_for_n":6,"shots_against":11.33,"shots_against_n":6,"shots_on_target_for":4.17,"shots_on_target_for_n":6,"possession_pct":41.17,"possession_pct_n":6,"pass_completion_pct":69.05,"pass_completion_pct_n":6,"passes_attempted_for":310.17,"passes_attempted_for_n":6,"long_ball_pct":37.71,"long_ball_pct_n":6,"cross_completion_pct":31.76,"cross_completion_pct_n":6,"corners_for":3.5,"corners_for_n":6,"corners_against":5.33,"corners_against_n":6,"tackles_for":2.6,"tackles_for_n":5,"interceptions_for":15.17,"interceptions_for_n":6,"clearances_for":37.33,"clearances_for_n":6,"offsides_for":2.33,"offsides_for_n":6,"duels_win_pct":52.05,"duels_win_pct_n":6,"ground_duels_win_pct":50.58,"ground_duels_win_pct_n":6,"aerial_duels_win_pct":54.74,"aerial_duels_win_pct_n":6,"dribble_success_pct":53.06,"dribble_success_pct_n":6,"fouls_for":11.67,"fouls_for_n":6,"saves_for":3.0,"saves_for_n":6,"yellow_cards_for":2.0,"yellow_cards_for_n":6,"red_cards_for":0.0,"red_cards_for_n":6,"discipline_points_for":17.67,"discipline_points_for_n":6},"Dagenham & Redbridge":{"matches":8,"goals_for":1.12,"goals_for_n":8,"goals_against":0.75,"goals_against_n":8,"xg_for":1.72,"xg_for_n":8,"xg_against":1.2,"xg_against_n":8,"shots_for":13.5,"shots_for_n":8,"shots_against":11.5,"shots_against_n":8,"shots_on_target_for":4.38,"shots_on_target_for_n":8,"possession_pct":43.75,"possession_pct_n":8,"pass_completion_pct":75.41,"pass_completion_pct_n":8,"passes_attempted_for":326.38,"passes_attempted_for_n":8,"long_ball_pct":51.08,"long_ball_pct_n":8,"cross_completion_pct":36.49,"cross_completion_pct_n":8,"corners_for":6.25,"corners_for_n":8,"corners_against":3.38,"corners_against_n":8,"tackles_for":1.67,"tackles_for_n":6,"interceptions_for":13.5,"interceptions_for_n":8,"clearances_for":31.38,"clearances_for_n":8,"offsides_for":1.5,"offsides_for_n":8,"duels_win_pct":50.81,"duels_win_pct_n":8,"ground_duels_win_pct":50.13,"ground_duels_win_pct_n":8,"aerial_duels_win_pct":51.99,"aerial_duels_win_pct_n":8,"dribble_success_pct":60.0,"dribble_success_pct_n":8,"fouls_for":11.5,"fouls_for_n":8,"saves_for":3.25,"saves_for_n":8,"yellow_cards_for":2.25,"yellow_cards_for_n":8,"red_cards_for":0.38,"red_cards_for_n":8,"discipline_points_for":21.62,"discipline_points_for_n":8},"Tonbridge Angels":{"matches":8,"goals_for":2.12,"goals_for_n":8,"goals_against":1.0,"goals_against_n":8,"xg_for":1.82,"xg_for_n":8,"xg_against":0.95,"xg_against_n":8,"shots_for":12.12,"shots_for_n":8,"shots_against":9.25,"shots_against_n":8,"shots_on_target_for":4.75,"shots_on_target_for_n":8,"possession_pct":42.62,"possession_pct_n":8,"pass_completion_pct":73.23,"pass_completion_pct_n":8,"passes_attempted_for":291.88,"passes_attempted_for_n":8,"long_ball_pct":45.45,"long_ball_pct_n":8,"cross_completion_pct":27.73,"cross_completion_pct_n":8,"corners_for":5.62,"corners_for_n":8,"corners_against":4.62,"corners_against_n":8,"tackles_for":1.5,"tackles_for_n":6,"interceptions_for":15.25,"interceptions_for_n":8,"clearances_for":31.88,"clearances_for_n":8,"offsides_for":1.5,"offsides_for_n":8,"duels_win_pct":49.64,"duels_win_pct_n":8,"ground_duels_win_pct":51.22,"ground_duels_win_pct_n":8,"aerial_duels_win_pct":46.96,"aerial_duels_win_pct_n":8,"dribble_success_pct":59.65,"dribble_success_pct_n":8,"fouls_for":9.12,"fouls_for_n":8,"saves_for":2.75,"saves_for_n":8,"yellow_cards_for":2.38,"yellow_cards_for_n":8,"red_cards_for":0.12,"red_cards_for_n":8,"discipline_points_for":17.38,"discipline_points_for_n":8},"Truro City":{"matches":7,"goals_for":1.57,"goals_for_n":7,"goals_against":0.43,"goals_against_n":7,"xg_for":1.88,"xg_for_n":7,"xg_against":0.82,"xg_against_n":7,"shots_for":12.0,"shots_for_n":7,"shots_against":6.14,"shots_against_n":7,"shots_on_target_for":3.29,"shots_on_target_for_n":7,"possession_pct":52.71,"possession_pct_n":7,"pass_completion_pct":76.69,"pass_completion_pct_n":7,"passes_attempted_for":371.43,"passes_attempted_for_n":7,"long_ball_pct":52.88,"long_ball_pct_n":7,"cross_completion_pct":32.58,"cross_completion_pct_n":7,"corners_for":6.29,"corners_for_n":7,"corners_against":5.86,"corners_against_n":7,"tackles_for":1.0,"tackles_for_n":3,"interceptions_for":12.43,"interceptions_for_n":7,"clearances_for":31.57,"clearances_for_n":7,"offsides_for":2.14,"offsides_for_n":7,"duels_win_pct":52.0,"duels_win_pct_n":7,"ground_duels_win_pct":48.34,"ground_duels_win_pct_n":7,"aerial_duels_win_pct":57.48,"aerial_duels_win_pct_n":7,"dribble_success_pct":66.67,"dribble_success_pct_n":7,"fouls_for":11.57,"fouls_for_n":7,"saves_for":2.29,"saves_for_n":7,"yellow_cards_for":1.0,"yellow_cards_for_n":7,"red_cards_for":0.14,"red_cards_for_n":7,"discipline_points_for":15.86,"discipline_points_for_n":7},"Dover Athletic":{"matches":8,"goals_for":1.75,"goals_for_n":8,"goals_against":2.0,"goals_against_n":8,"xg_for":1.39,"xg_for_n":7,"xg_against":2.31,"xg_against_n":7,"shots_for":9.14,"shots_for_n":7,"shots_against":15.29,"shots_against_n":7,"shots_on_target_for":3.14,"shots_on_target_for_n":7,"possession_pct":36.12,"possession_pct_n":8,"pass_completion_pct":62.29,"pass_completion_pct_n":7,"passes_attempted_for":229.57,"passes_attempted_for_n":7,"long_ball_pct":36.67,"long_ball_pct_n":7,"cross_completion_pct":25.0,"cross_completion_pct_n":7,"corners_for":4.88,"corners_for_n":8,"corners_against":5.88,"corners_against_n":8,"tackles_for":3.4,"tackles_for_n":5,"interceptions_for":15.0,"interceptions_for_n":7,"clearances_for":39.14,"clearances_for_n":7,"offsides_for":1.86,"offsides_for_n":7,"duels_win_pct":50.29,"duels_win_pct_n":7,"ground_duels_win_pct":51.47,"ground_duels_win_pct_n":7,"aerial_duels_win_pct":48.38,"aerial_duels_win_pct_n":7,"dribble_success_pct":51.85,"dribble_success_pct_n":7,"fouls_for":10.86,"fouls_for_n":7,"saves_for":3.57,"saves_for_n":7,"yellow_cards_for":1.29,"yellow_cards_for_n":7,"red_cards_for":0.29,"red_cards_for_n":7,"discipline_points_for":17.29,"discipline_points_for_n":7},"Dorking Wanderers":{"matches":8,"goals_for":2.0,"goals_for_n":8,"goals_against":1.38,"goals_against_n":8,"xg_for":1.73,"xg_for_n":8,"xg_against":1.47,"xg_against_n":8,"shots_for":14.75,"shots_for_n":8,"shots_against":11.0,"shots_against_n":8,"shots_on_target_for":5.75,"shots_on_target_for_n":8,"possession_pct":61.12,"possession_pct_n":8,"pass_completion_pct":80.65,"pass_completion_pct_n":8,"passes_attempted_for":484.5,"passes_attempted_for_n":8,"long_ball_pct":46.85,"long_ball_pct_n":8,"cross_completion_pct":32.47,"cross_completion_pct_n":8,"corners_for":6.12,"corners_for_n":8,"corners_against":3.88,"corners_against_n":8,"tackles_for":1.6,"tackles_for_n":5,"interceptions_for":13.38,"interceptions_for_n":8,"clearances_for":34.12,"clearances_for_n":8,"offsides_for":1.88,"offsides_for_n":8,"duels_win_pct":51.59,"duels_win_pct_n":8,"ground_duels_win_pct":52.12,"ground_duels_win_pct_n":8,"aerial_duels_win_pct":50.29,"aerial_duels_win_pct_n":8,"dribble_success_pct":71.19,"dribble_success_pct_n":8,"fouls_for":13.5,"fouls_for_n":8,"saves_for":2.38,"saves_for_n":8,"yellow_cards_for":2.38,"yellow_cards_for_n":8,"red_cards_for":0.0,"red_cards_for_n":8,"discipline_points_for":20.62,"discipline_points_for_n":8},"Farnham Town":{"matches":7,"goals_for":1.29,"goals_for_n":7,"goals_against":1.29,"goals_against_n":7,"xg_for":1.57,"xg_for_n":7,"xg_against":2.2,"xg_against_n":7,"shots_for":12.43,"shots_for_n":7,"shots_against":16.43,"shots_against_n":7,"shots_on_target_for":5.43,"shots_on_target_for_n":7,"possession_pct":50.86,"possession_pct_n":7,"pass_completion_pct":81.98,"pass_completion_pct_n":7,"passes_attempted_for":475.57,"passes_attempted_for_n":7,"long_ball_pct":48.0,"long_ball_pct_n":7,"cross_completion_pct":29.35,"cross_completion_pct_n":7,"corners_for":3.43,"corners_for_n":7,"corners_against":6.43,"corners_against_n":7,"tackles_for":2.5,"tackles_for_n":4,"interceptions_for":13.86,"interceptions_for_n":7,"clearances_for":31.14,"clearances_for_n":7,"offsides_for":1.14,"offsides_for_n":7,"duels_win_pct":49.66,"duels_win_pct_n":7,"ground_duels_win_pct":50.0,"ground_duels_win_pct_n":7,"aerial_duels_win_pct":48.94,"aerial_duels_win_pct_n":7,"dribble_success_pct":64.2,"dribble_success_pct_n":7,"fouls_for":7.86,"fouls_for_n":7,"saves_for":3.43,"saves_for_n":7,"yellow_cards_for":1.43,"yellow_cards_for_n":7,"red_cards_for":0.0,"red_cards_for_n":7,"discipline_points_for":12.14,"discipline_points_for_n":7},"Salisbury":{"matches":8,"goals_for":1.88,"goals_for_n":8,"goals_against":0.88,"goals_against_n":8,"xg_for":2.28,"xg_for_n":8,"xg_against":1.1,"xg_against_n":8,"shots_for":15.62,"shots_for_n":8,"shots_against":8.5,"shots_against_n":8,"shots_on_target_for":6.0,"shots_on_target_for_n":8,"possession_pct":49.25,"possession_pct_n":8,"pass_completion_pct":72.7,"pass_completion_pct_n":8,"passes_attempted_for":377.75,"passes_attempted_for_n":8,"long_ball_pct":38.73,"long_ball_pct_n":8,"cross_completion_pct":29.46,"cross_completion_pct_n":8,"corners_for":4.88,"corners_for_n":8,"corners_against":6.0,"corners_against_n":8,"tackles_for":1.4,"tackles_for_n":5,"interceptions_for":16.12,"interceptions_for_n":8,"clearances_for":34.25,"clearances_for_n":8,"offsides_for":1.38,"offsides_for_n":8,"duels_win_pct":50.4,"duels_win_pct_n":8,"ground_duels_win_pct":49.69,"ground_duels_win_pct_n":8,"aerial_duels_win_pct":52.11,"aerial_duels_win_pct_n":8,"dribble_success_pct":65.16,"dribble_success_pct_n":8,"fouls_for":9.75,"fouls_for_n":8,"saves_for":2.12,"saves_for_n":8,"yellow_cards_for":1.62,"yellow_cards_for_n":8,"red_cards_for":0.25,"red_cards_for_n":8,"discipline_points_for":16.88,"discipline_points_for_n":8},"Folkestone Invicta":{"matches":8,"goals_for":1.88,"goals_for_n":8,"goals_against":1.12,"goals_against_n":8,"xg_for":2.16,"xg_for_n":6,"xg_against":1.88,"xg_against_n":6,"shots_for":12.17,"shots_for_n":6,"shots_against":11.17,"shots_against_n":6,"shots_on_target_for":6.0,"shots_on_target_for_n":6,"possession_pct":35.0,"possession_pct_n":8,"pass_completion_pct":76.28,"pass_completion_pct_n":6,"passes_attempted_for":373.83,"passes_attempted_for_n":6,"long_ball_pct":46.24,"long_ball_pct_n":6,"cross_completion_pct":34.48,"cross_completion_pct_n":6,"corners_for":3.88,"corners_for_n":8,"corners_against":2.62,"corners_against_n":8,"tackles_for":1.75,"tackles_for_n":4,"interceptions_for":13.5,"interceptions_for_n":6,"clearances_for":29.33,"clearances_for_n":6,"offsides_for":2.17,"offsides_for_n":6,"duels_win_pct":50.81,"duels_win_pct_n":6,"ground_duels_win_pct":48.28,"ground_duels_win_pct_n":6,"aerial_duels_win_pct":57.31,"aerial_duels_win_pct_n":6,"dribble_success_pct":51.22,"dribble_success_pct_n":6,"fouls_for":10.5,"fouls_for_n":6,"saves_for":2.83,"saves_for_n":6,"yellow_cards_for":1.5,"yellow_cards_for_n":6,"red_cards_for":0.0,"red_cards_for_n":6,"discipline_points_for":15.0,"discipline_points_for_n":6},"Billericay Town":{"matches":8,"goals_for":1.88,"goals_for_n":8,"goals_against":1.5,"goals_against_n":8,"xg_for":2.01,"xg_for_n":8,"xg_against":1.96,"xg_against_n":8,"shots_for":13.12,"shots_for_n":8,"shots_against":15.62,"shots_against_n":8,"shots_on_target_for":5.75,"shots_on_target_for_n":8,"possession_pct":41.0,"possession_pct_n":8,"pass_completion_pct":72.11,"pass_completion_pct_n":8,"passes_attempted_for":286.88,"passes_attempted_for_n":8,"long_ball_pct":42.79,"long_ball_pct_n":8,"cross_completion_pct":33.63,"cross_completion_pct_n":8,"corners_for":4.38,"corners_for_n":8,"corners_against":8.25,"corners_against_n":8,"tackles_for":1.0,"tackles_for_n":3,"interceptions_for":17.12,"interceptions_for_n":8,"clearances_for":46.75,"clearances_for_n":8,"offsides_for":2.5,"offsides_for_n":8,"duels_win_pct":48.86,"duels_win_pct_n":8,"ground_duels_win_pct":50.13,"ground_duels_win_pct_n":8,"aerial_duels_win_pct":46.67,"aerial_duels_win_pct_n":8,"dribble_success_pct":66.96,"dribble_success_pct_n":8,"fouls_for":7.5,"fouls_for_n":8,"saves_for":2.62,"saves_for_n":8,"yellow_cards_for":1.62,"yellow_cards_for_n":8,"red_cards_for":0.0,"red_cards_for_n":8,"discipline_points_for":12.38,"discipline_points_for_n":8},"Chesham United":{"matches":8,"goals_for":1.5,"goals_for_n":8,"goals_against":1.75,"goals_against_n":8,"xg_for":1.54,"xg_for_n":8,"xg_against":1.75,"xg_against_n":8,"shots_for":13.12,"shots_for_n":8,"shots_against":12.12,"shots_against_n":8,"shots_on_target_for":4.25,"shots_on_target_for_n":8,"possession_pct":58.0,"possession_pct_n":8,"pass_completion_pct":81.53,"pass_completion_pct_n":8,"passes_attempted_for":448.0,"passes_attempted_for_n":8,"long_ball_pct":53.8,"long_ball_pct_n":8,"cross_completion_pct":39.66,"cross_completion_pct_n":8,"corners_for":5.5,"corners_for_n":8,"corners_against":6.0,"corners_against_n":8,"tackles_for":1.67,"tackles_for_n":3,"interceptions_for":13.25,"interceptions_for_n":8,"clearances_for":29.62,"clearances_for_n":8,"offsides_for":1.88,"offsides_for_n":8,"duels_win_pct":47.06,"duels_win_pct_n":8,"ground_duels_win_pct":48.5,"ground_duels_win_pct_n":8,"aerial_duels_win_pct":45.0,"aerial_duels_win_pct_n":8,"dribble_success_pct":60.53,"dribble_success_pct_n":8,"fouls_for":8.75,"fouls_for_n":8,"saves_for":3.0,"saves_for_n":8,"yellow_cards_for":1.5,"yellow_cards_for_n":8,"red_cards_for":0.0,"red_cards_for_n":8,"discipline_points_for":13.25,"discipline_points_for_n":8},"Chelmsford":{"matches":8,"goals_for":1.14,"goals_for_n":7,"goals_against":1.0,"goals_against_n":7,"xg_for":1.3,"xg_for_n":7,"xg_against":1.24,"xg_against_n":7,"shots_for":9.71,"shots_for_n":7,"shots_against":11.71,"shots_against_n":7,"shots_on_target_for":4.0,"shots_on_target_for_n":7,"possession_pct":52.43,"possession_pct_n":7,"pass_completion_pct":80.93,"pass_completion_pct_n":7,"passes_attempted_for":425.57,"passes_attempted_for_n":7,"long_ball_pct":52.93,"long_ball_pct_n":7,"cross_completion_pct":43.06,"cross_completion_pct_n":7,"corners_for":5.14,"corners_for_n":7,"corners_against":3.29,"corners_against_n":7,"tackles_for":1.4,"tackles_for_n":5,"interceptions_for":16.57,"interceptions_for_n":7,"clearances_for":30.0,"clearances_for_n":7,"offsides_for":2.43,"offsides_for_n":7,"duels_win_pct":47.81,"duels_win_pct_n":7,"ground_duels_win_pct":47.96,"ground_duels_win_pct_n":7,"aerial_duels_win_pct":47.45,"aerial_duels_win_pct_n":7,"dribble_success_pct":68.24,"dribble_success_pct_n":7,"fouls_for":10.29,"fouls_for_n":7,"saves_for":4.14,"saves_for_n":7,"yellow_cards_for":1.57,"yellow_cards_for_n":7,"red_cards_for":0.0,"red_cards_for_n":7,"discipline_points_for":15.0,"discipline_points_for_n":7},"Horsham":{"matches":8,"goals_for":1.12,"goals_for_n":8,"goals_against":1.25,"goals_against_n":8,"xg_for":1.55,"xg_for_n":8,"xg_against":1.38,"xg_against_n":8,"shots_for":11.62,"shots_for_n":8,"shots_against":11.25,"shots_against_n":8,"shots_on_target_for":3.88,"shots_on_target_for_n":8,"possession_pct":52.0,"possession_pct_n":8,"pass_completion_pct":75.1,"pass_completion_pct_n":8,"passes_attempted_for":392.0,"passes_attempted_for_n":8,"long_ball_pct":43.5,"long_ball_pct_n":8,"cross_completion_pct":34.07,"cross_completion_pct_n":8,"corners_for":5.88,"corners_for_n":8,"corners_against":4.38,"corners_against_n":8,"tackles_for":2.67,"tackles_for_n":6,"interceptions_for":13.88,"interceptions_for_n":8,"clearances_for":34.62,"clearances_for_n":8,"offsides_for":2.62,"offsides_for_n":8,"duels_win_pct":50.85,"duels_win_pct_n":8,"ground_duels_win_pct":50.0,"ground_duels_win_pct_n":8,"aerial_duels_win_pct":49.89,"aerial_duels_win_pct_n":8,"dribble_success_pct":62.79,"dribble_success_pct_n":8,"fouls_for":10.75,"fouls_for_n":8,"saves_for":2.62,"saves_for_n":8,"yellow_cards_for":2.12,"yellow_cards_for_n":8,"red_cards_for":0.12,"red_cards_for_n":8,"discipline_points_for":18.25,"discipline_points_for_n":8},"Hemel Hempstead":{"matches":8,"goals_for":0.88,"goals_for_n":8,"goals_against":1.12,"goals_against_n":8,"xg_for":1.35,"xg_for_n":7,"xg_against":1.83,"xg_against_n":7,"shots_for":9.71,"shots_for_n":7,"shots_against":11.43,"shots_against_n":7,"shots_on_target_for":2.71,"shots_on_target_for_n":7,"possession_pct":39.62,"possession_pct_n":8,"pass_completion_pct":73.9,"pass_completion_pct_n":7,"passes_attempted_for":325.71,"passes_attempted_for_n":7,"long_ball_pct":47.42,"long_ball_pct_n":7,"cross_completion_pct":41.38,"cross_completion_pct_n":7,"corners_for":4.0,"corners_for_n":8,"corners_against":4.25,"corners_against_n":8,"tackles_for":1.25,"tackles_for_n":4,"interceptions_for":13.57,"interceptions_for_n":7,"clearances_for":27.57,"clearances_for_n":7,"offsides_for":1.86,"offsides_for_n":7,"duels_win_pct":46.86,"duels_win_pct_n":7,"ground_duels_win_pct":47.82,"ground_duels_win_pct_n":7,"aerial_duels_win_pct":45.1,"aerial_duels_win_pct_n":7,"dribble_success_pct":47.76,"dribble_success_pct_n":7,"fouls_for":9.14,"fouls_for_n":7,"saves_for":3.0,"saves_for_n":7,"yellow_cards_for":1.43,"yellow_cards_for_n":7,"red_cards_for":0.14,"red_cards_for_n":7,"discipline_points_for":14.71,"discipline_points_for_n":7},"Braintree Town":{"matches":8,"goals_for":1.62,"goals_for_n":8,"goals_against":2.25,"goals_against_n":8,"xg_for":1.47,"xg_for_n":7,"xg_against":1.86,"xg_against_n":7,"shots_for":12.43,"shots_for_n":7,"shots_against":11.86,"shots_against_n":7,"shots_on_target_for":4.86,"shots_on_target_for_n":7,"possession_pct":46.38,"possession_pct_n":8,"pass_completion_pct":70.88,"pass_completion_pct_n":7,"passes_attempted_for":318.43,"passes_attempted_for_n":7,"long_ball_pct":44.34,"long_ball_pct_n":7,"cross_completion_pct":26.19,"cross_completion_pct_n":7,"corners_for":4.25,"corners_for_n":8,"corners_against":4.88,"corners_against_n":8,"tackles_for":1.67,"tackles_for_n":3,"interceptions_for":15.71,"interceptions_for_n":7,"clearances_for":40.86,"clearances_for_n":7,"offsides_for":0.86,"offsides_for_n":7,"duels_win_pct":51.36,"duels_win_pct_n":7,"ground_duels_win_pct":52.93,"ground_duels_win_pct_n":7,"aerial_duels_win_pct":48.53,"aerial_duels_win_pct_n":7,"dribble_success_pct":56.7,"dribble_success_pct_n":7,"fouls_for":10.29,"fouls_for_n":7,"saves_for":2.14,"saves_for_n":7,"yellow_cards_for":1.57,"yellow_cards_for_n":7,"red_cards_for":0.14,"red_cards_for_n":7,"discipline_points_for":16.29,"discipline_points_for_n":7},"AFC Totton":{"matches":8,"goals_for":1.0,"goals_for_n":8,"goals_against":1.62,"goals_against_n":8,"xg_for":1.75,"xg_for_n":7,"xg_against":1.83,"xg_against_n":7,"shots_for":11.86,"shots_for_n":7,"shots_against":15.43,"shots_against_n":7,"shots_on_target_for":4.0,"shots_on_target_for_n":7,"possession_pct":41.38,"possession_pct_n":8,"pass_completion_pct":78.42,"pass_completion_pct_n":7,"passes_attempted_for":356.14,"passes_attempted_for_n":7,"long_ball_pct":52.03,"long_ball_pct_n":7,"cross_completion_pct":38.53,"cross_completion_pct_n":7,"corners_for":5.0,"corners_for_n":8,"corners_against":4.0,"corners_against_n":8,"tackles_for":1.2,"tackles_for_n":5,"interceptions_for":11.0,"interceptions_for_n":7,"clearances_for":23.71,"clearances_for_n":7,"offsides_for":1.57,"offsides_for_n":7,"duels_win_pct":48.84,"duels_win_pct_n":7,"ground_duels_win_pct":45.99,"ground_duels_win_pct_n":7,"aerial_duels_win_pct":53.18,"aerial_duels_win_pct_n":7,"dribble_success_pct":58.73,"dribble_success_pct_n":7,"fouls_for":10.57,"fouls_for_n":7,"saves_for":3.86,"saves_for_n":7,"yellow_cards_for":1.29,"yellow_cards_for_n":7,"red_cards_for":0.14,"red_cards_for_n":7,"discipline_points_for":15.71,"discipline_points_for_n":7},"Farnborough":{"matches":8,"goals_for":0.75,"goals_for_n":8,"goals_against":1.38,"goals_against_n":8,"xg_for":2.03,"xg_for_n":8,"xg_against":1.72,"xg_against_n":8,"shots_for":14.12,"shots_for_n":8,"shots_against":12.5,"shots_against_n":8,"shots_on_target_for":3.38,"shots_on_target_for_n":8,"possession_pct":49.0,"possession_pct_n":8,"pass_completion_pct":72.4,"pass_completion_pct_n":8,"passes_attempted_for":315.62,"passes_attempted_for_n":8,"long_ball_pct":45.07,"long_ball_pct_n":8,"cross_completion_pct":29.01,"cross_completion_pct_n":8,"corners_for":7.75,"corners_for_n":8,"corners_against":4.12,"corners_against_n":8,"tackles_for":1.0,"tackles_for_n":3,"interceptions_for":14.0,"interceptions_for_n":8,"clearances_for":30.75,"clearances_for_n":8,"offsides_for":1.75,"offsides_for_n":8,"duels_win_pct":50.24,"duels_win_pct_n":8,"ground_duels_win_pct":50.63,"ground_duels_win_pct_n":8,"aerial_duels_win_pct":49.38,"aerial_duels_win_pct_n":8,"dribble_success_pct":74.29,"dribble_success_pct_n":8,"fouls_for":10.62,"fouls_for_n":8,"saves_for":7.38,"saves_for_n":8,"yellow_cards_for":1.38,"yellow_cards_for_n":8,"red_cards_for":0.12,"red_cards_for_n":8,"discipline_points_for":15.88,"discipline_points_for_n":8},"Hampton & Richmond Borough":{"matches":8,"goals_for":1.25,"goals_for_n":8,"goals_against":2.75,"goals_against_n":8,"xg_for":1.54,"xg_for_n":8,"xg_against":2.16,"xg_against_n":8,"shots_for":10.12,"shots_for_n":8,"shots_against":13.12,"shots_against_n":8,"shots_on_target_for":4.5,"shots_on_target_for_n":8,"possession_pct":50.88,"possession_pct_n":8,"pass_completion_pct":76.19,"pass_completion_pct_n":8,"passes_attempted_for":369.62,"passes_attempted_for_n":8,"long_ball_pct":46.15,"long_ball_pct_n":8,"cross_completion_pct":20.93,"cross_completion_pct_n":8,"corners_for":4.38,"corners_for_n":8,"corners_against":6.5,"corners_against_n":8,"tackles_for":1.83,"tackles_for_n":6,"interceptions_for":12.75,"interceptions_for_n":8,"clearances_for":33.75,"clearances_for_n":8,"offsides_for":2.12,"offsides_for_n":8,"duels_win_pct":51.41,"duels_win_pct_n":8,"ground_duels_win_pct":51.09,"ground_duels_win_pct_n":8,"aerial_duels_win_pct":51.98,"aerial_duels_win_pct_n":8,"dribble_success_pct":53.39,"dribble_success_pct_n":8,"fouls_for":10.5,"fouls_for_n":8,"saves_for":2.62,"saves_for_n":8,"yellow_cards_for":2.5,"yellow_cards_for_n":8,"red_cards_for":0.0,"red_cards_for_n":8,"discipline_points_for":18.0,"discipline_points_for_n":8},"Slough Town":{"matches":8,"goals_for":1.12,"goals_for_n":8,"goals_against":2.62,"goals_against_n":8,"xg_for":1.67,"xg_for_n":8,"xg_against":2.31,"xg_against_n":8,"shots_for":12.0,"shots_for_n":8,"shots_against":15.38,"shots_against_n":8,"shots_on_target_for":4.12,"shots_on_target_for_n":8,"possession_pct":55.0,"possession_pct_n":8,"pass_completion_pct":80.02,"pass_completion_pct_n":8,"passes_attempted_for":458.0,"passes_attempted_for_n":8,"long_ball_pct":39.17,"long_ball_pct_n":8,"cross_completion_pct":29.47,"cross_completion_pct_n":8,"corners_for":4.25,"corners_for_n":8,"corners_against":6.12,"corners_against_n":8,"tackles_for":1.33,"tackles_for_n":3,"interceptions_for":15.12,"interceptions_for_n":8,"clearances_for":35.5,"clearances_for_n":8,"offsides_for":2.88,"offsides_for_n":8,"duels_win_pct":47.41,"duels_win_pct_n":8,"ground_duels_win_pct":46.15,"ground_duels_win_pct_n":8,"aerial_duels_win_pct":50.13,"aerial_duels_win_pct_n":8,"dribble_success_pct":58.75,"dribble_success_pct_n":8,"fouls_for":11.12,"fouls_for_n":8,"saves_for":5.25,"saves_for_n":8,"yellow_cards_for":1.38,"yellow_cards_for_n":8,"red_cards_for":0.12,"red_cards_for_n":8,"discipline_points_for":16.38,"discipline_points_for_n":8},"Walton & Hersham":{"matches":8,"goals_for":0.5,"goals_for_n":8,"goals_against":3.0,"goals_against_n":8,"xg_for":1.03,"xg_for_n":8,"xg_against":2.82,"xg_against_n":8,"shots_for":8.75,"shots_for_n":8,"shots_against":15.5,"shots_against_n":8,"shots_on_target_for":2.62,"shots_on_target_for_n":8,"possession_pct":49.25,"possession_pct_n":8,"pass_completion_pct":80.15,"pass_completion_pct_n":8,"passes_attempted_for":413.12,"passes_attempted_for_n":8,"long_ball_pct":45.16,"long_ball_pct_n":8,"cross_completion_pct":32.2,"cross_completion_pct_n":8,"corners_for":3.38,"corners_for_n":8,"corners_against":6.38,"corners_against_n":8,"tackles_for":1.83,"tackles_for_n":6,"interceptions_for":13.75,"interceptions_for_n":8,"clearances_for":32.25,"clearances_for_n":8,"offsides_for":1.75,"offsides_for_n":8,"duels_win_pct":48.55,"duels_win_pct_n":8,"ground_duels_win_pct":50.38,"ground_duels_win_pct_n":8,"aerial_duels_win_pct":43.87,"aerial_duels_win_pct_n":8,"dribble_success_pct":66.27,"dribble_success_pct_n":8,"fouls_for":8.12,"fouls_for_n":8,"saves_for":3.25,"saves_for_n":8,"yellow_cards_for":1.25,"yellow_cards_for_n":8,"red_cards_for":0.0,"red_cards_for_n":8,"discipline_points_for":11.88,"discipline_points_for_n":8},"Maidenhead United":{"matches":8,"goals_for":0.75,"goals_for_n":8,"goals_against":1.12,"goals_against_n":8,"xg_for":1.41,"xg_for_n":8,"xg_against":1.82,"xg_against_n":8,"shots_for":11.12,"shots_for_n":8,"shots_against":11.38,"shots_against_n":8,"shots_on_target_for":3.88,"shots_on_target_for_n":8,"possession_pct":48.5,"possession_pct_n":8,"pass_completion_pct":75.76,"pass_completion_pct_n":8,"passes_attempted_for":318.75,"passes_attempted_for_n":8,"long_ball_pct":45.82,"long_ball_pct_n":8,"cross_completion_pct":33.63,"cross_completion_pct_n":8,"corners_for":4.25,"corners_for_n":8,"corners_against":5.88,"corners_against_n":8,"tackles_for":2.8,"tackles_for_n":5,"interceptions_for":11.62,"interceptions_for_n":8,"clearances_for":37.38,"clearances_for_n":8,"offsides_for":1.62,"offsides_for_n":8,"duels_win_pct":53.84,"duels_win_pct_n":8,"ground_duels_win_pct":54.8,"ground_duels_win_pct_n":8,"aerial_duels_win_pct":51.74,"aerial_duels_win_pct_n":8,"dribble_success_pct":71.31,"dribble_success_pct_n":8,"fouls_for":12.0,"fouls_for_n":8,"saves_for":2.62,"saves_for_n":8,"yellow_cards_for":1.88,"yellow_cards_for_n":8,"red_cards_for":0.5,"red_cards_for_n":8,"discipline_points_for":22.12,"discipline_points_for_n":8}};
+const leagueAvg = {"goals_for":1.409,"goals_against":1.453,"xg_for":1.645,"xg_against":1.68,"shots_for":11.82,"shots_against":12.189,"shots_on_target_for":4.397,"possession_pct":47.638,"pass_completion_pct":75.558,"passes_attempted_for":366.928,"long_ball_pct":45.536,"cross_completion_pct":32.211,"corners_for":4.95,"corners_against":5.121,"tackles_for":1.742,"interceptions_for":14.28,"clearances_for":33.535,"offsides_for":1.897,"duels_win_pct":49.999,"ground_duels_win_pct":50.018,"aerial_duels_win_pct":50.027,"dribble_success_pct":61.609,"fouls_for":10.221,"saves_for":3.233,"yellow_cards_for":1.652,"red_cards_for":0.112,"discipline_points_for":16.19};
+
+const MUFC = "Maidenhead United";
+const opponents = Object.keys(teamData).filter(t => t !== MUFC).sort();
+
+const metricGroups = [
+  { label: "Attacking", keys: ["goals_for","xg_for","shots_for","shots_on_target_for"] },
+  { label: "Possession & passing", keys: ["possession_pct","pass_completion_pct","passes_attempted_for","long_ball_pct","cross_completion_pct"] },
+  { label: "Set pieces", keys: ["corners_for","corners_against"] },
+  { label: "Defending", keys: ["interceptions_for","clearances_for","shots_against","goals_against","xg_against"] },
+  { label: "Duels & dribbling", keys: ["ground_duels_win_pct","aerial_duels_win_pct","dribble_success_pct"] },
+  { label: "Discipline & goalkeeping", keys: ["fouls_for","yellow_cards_for","red_cards_for","discipline_points_for","saves_for"] },
+];
+
+const metricInfo = {
+  goals_for: { label: "Goals scored /match", unit: "" },
+  goals_against: { label: "Goals conceded /match", unit: "" },
+  xg_for: { label: "xG /match", unit: "" },
+  xg_against: { label: "xG conceded /match", unit: "" },
+  shots_for: { label: "Shots /match", unit: "" },
+  shots_against: { label: "Shots conceded /match", unit: "" },
+  shots_on_target_for: { label: "Shots on target /match", unit: "" },
+  possession_pct: { label: "Possession", unit: "%" },
+  pass_completion_pct: { label: "Pass completion", unit: "%" },
+  passes_attempted_for: { label: "Passes attempted /match", unit: "" },
+  long_ball_pct: { label: "Long ball success", unit: "%" },
+  cross_completion_pct: { label: "Cross completion", unit: "%" },
+  corners_for: { label: "Corners won /match", unit: "" },
+  corners_against: { label: "Corners conceded /match", unit: "" },
+  interceptions_for: { label: "Interceptions /match", unit: "" },
+  clearances_for: { label: "Clearances /match", unit: "" },
+  ground_duels_win_pct: { label: "Ground duels won", unit: "%" },
+  aerial_duels_win_pct: { label: "Aerial duels won", unit: "%" },
+  dribble_success_pct: { label: "Dribble success", unit: "%" },
+  fouls_for: { label: "Fouls committed /match", unit: "" },
+  yellow_cards_for: { label: "Yellow cards /match", unit: "" },
+  red_cards_for: { label: "Red cards /match", unit: "" },
+  discipline_points_for: { label: "Discipline points /match", unit: "" },
+  saves_for: { label: "Saves /match", unit: "" },
+};
+
+let oppTeam = opponents[0];
+let viewMode = "radar";
+
+function fmt(key, value) {
+  if (value === null || value === undefined) return "\u2014";
+  const unit = metricInfo[key] ? metricInfo[key].unit : "";
+  if (unit === "%") return value.toFixed(1) + "%";
+  if (Math.abs(value) >= 100) return value.toFixed(0);
+  return value.toFixed(2);
+}
+
+// --- Opponent select ---
+const oppSelect = document.getElementById("oppSelect");
+opponents.forEach(t => {
+  const opt = document.createElement("option");
+  opt.value = t; opt.textContent = t;
+  oppSelect.appendChild(opt);
+});
+oppSelect.value = oppTeam;
+oppSelect.addEventListener("change", () => { oppTeam = oppSelect.value; render(); });
+
+function updateMatchCounts() {
+  document.getElementById("mufcN").textContent = `(${teamData[MUFC].matches} matches)`;
+  document.getElementById("oppN").textContent = `(${teamData[oppTeam].matches} matches)`;
+}
+
+// --- Radar axis sets ---
+const ATTACK_KEYS = ["xg_for","shots_for","shots_on_target_for","corners_for","possession_pct","pass_completion_pct","long_ball_pct","cross_completion_pct"];
+const DEFEND_KEYS = ["interceptions_for","clearances_for","ground_duels_win_pct","aerial_duels_win_pct","xg_against","shots_against","corners_against"];
+const RADAR_KEYS = ATTACK_KEYS.concat(DEFEND_KEYS);
+
+const metricScaleType = {
+  xg_for: "count_for", shots_for: "count_for", shots_on_target_for: "count_for", corners_for: "count_for",
+  possession_pct: "percentage", pass_completion_pct: "percentage", long_ball_pct: "percentage", cross_completion_pct: "percentage",
+  interceptions_for: "count_for", clearances_for: "count_for",
+  ground_duels_win_pct: "percentage", aerial_duels_win_pct: "percentage",
+  xg_against: "count_against_inverted", shots_against: "count_against_inverted", corners_against: "count_against_inverted",
+};
+
+const metricShortLabel = {
+  xg_for: "xG", shots_for: "Shots", shots_on_target_for: "Shots on target", corners_for: "Corners won",
+  possession_pct: "Possession", pass_completion_pct: "Pass %", long_ball_pct: "Long ball %", cross_completion_pct: "Cross %",
+  interceptions_for: "Interceptions", clearances_for: "Clearances",
+  ground_duels_win_pct: "Ground duels won", aerial_duels_win_pct: "Aerial duels won",
+  xg_against: "xG conceded", shots_against: "Shots conceded", corners_against: "Corners conceded",
+};
+
+// Zero-anchored / min-max ranges computed across all 22 clubs, over the radar metric set only.
+const metricMax = {};
+const metricMin = {};
+RADAR_KEYS.forEach(k => {
+  const vals = Object.values(teamData).map(d => d[k]).filter(v => v !== null && v !== undefined);
+  metricMax[k] = vals.length ? Math.max(...vals) : null;
+  metricMin[k] = vals.length ? Math.min(...vals) : null;
+});
+
+function scaleValue(key, value) {
+  if (value === null || value === undefined) return null;
+  const type = metricScaleType[key];
+  if (type === "percentage") return Math.max(0, Math.min(100, value));
+  if (type === "count_for") {
+    const max = metricMax[key];
+    if (!max) return 0;
+    return Math.max(0, Math.min(100, (value / max) * 100));
+  }
+  if (type === "count_against_inverted") {
+    const max = metricMax[key], min = metricMin[key];
+    if (max === min) return 100;
+    return Math.max(0, Math.min(100, ((max - value) / (max - min)) * 100));
+  }
+  return null;
+}
+
+const radarCharts = {};
+
+function renderRadarChart(canvasId, keys) {
+  const ctx = document.getElementById(canvasId).getContext("2d");
+  if (radarCharts[canvasId]) radarCharts[canvasId].destroy();
+
+  const mufcScaled = keys.map(k => { const v = scaleValue(k, teamData[MUFC][k]); return v === null ? 0 : v; });
+  const oppScaled = keys.map(k => { const v = scaleValue(k, teamData[oppTeam][k]); return v === null ? 0 : v; });
+  const avgScaled = keys.map(k => { const v = scaleValue(k, leagueAvg[k]); return v === null ? 0 : v; });
+
+  radarCharts[canvasId] = new Chart(ctx, {
+    type: "radar",
+    data: {
+      labels: keys.map(k => metricShortLabel[k]),
+      datasets: [
+        { label: MUFC, data: mufcScaled, borderColor: "#c8102e", backgroundColor: "#c8102e33", pointBackgroundColor: "#c8102e", borderWidth: 2 },
+        { label: oppTeam, data: oppScaled, borderColor: "#2f6fb0", backgroundColor: "#2f6fb033", pointBackgroundColor: "#2f6fb0", borderWidth: 2 },
+        { label: "League average", data: avgScaled, borderColor: "#6f6a5c", backgroundColor: "transparent", borderDash: [4, 4], pointRadius: 0, borderWidth: 1.5 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: { r: { min: 0, max: 100, ticks: { display: false }, pointLabels: { font: { size: 10.5 } } } },
+      plugins: {
+        legend: { position: "bottom", labels: { font: { family: "'Helvetica Neue',Arial,sans-serif", size: 11.5 }, boxWidth: 14 } },
+        tooltip: {
+          callbacks: {
+            label: (ctx2) => {
+              const k = keys[ctx2.dataIndex];
+              const team = ctx2.dataset.label;
+              if (team === "League average") return `League average: ${fmt(k, leagueAvg[k])}`;
+              return `${team}: ${fmt(k, teamData[team][k])}`;
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+function renderRadar() {
+  renderRadarChart("radarAtt", ATTACK_KEYS);
+  renderRadarChart("radarDef", DEFEND_KEYS);
+}
+
+function renderTable() {
+  const mufcData = teamData[MUFC];
+  const oppData = teamData[oppTeam];
+  let html = `<table class="compare-table"><thead><tr><th>Metric</th><th>${MUFC}</th><th>${oppTeam}</th></tr></thead><tbody>`;
+  metricGroups.forEach(group => {
+    html += `<tr><td colspan="3" style="color:var(--muted); font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em; border-bottom:1px solid var(--line); padding-top:14px;">${group.label}</td></tr>`;
+    group.keys.forEach(k => {
+      const mv = mufcData[k], ov = oppData[k];
+      let mCls = "", oCls = "";
+      if (mv !== null && ov !== null && mv !== ov) {
+        if (mv > ov) mCls = "winner mufc-win"; else oCls = "winner opp-win";
+      }
+      html += `<tr><td>${metricInfo[k].label}</td><td class="${mCls}">${fmt(k, mv)}</td><td class="${oCls}">${fmt(k, ov)}</td></tr>`;
+    });
+  });
+  html += `</tbody></table>`;
+  document.getElementById("tableWrap").innerHTML = html;
+}
+
+// --- View switching ---
+const viewRadarBtn = document.getElementById("viewRadarBtn");
+const viewTableBtn = document.getElementById("viewTableBtn");
+const radarViews = document.getElementById("radarViews");
+const tableWrap = document.getElementById("tableWrap");
+
+function setView(mode) {
+  viewMode = mode;
+  [viewRadarBtn, viewTableBtn].forEach(b => b.classList.remove("active"));
+  document.getElementById("radarExplainer").style.display = "none";
+  document.getElementById("tableExplainer").style.display = "none";
+  if (mode === "radar") { viewRadarBtn.classList.add("active"); document.getElementById("radarExplainer").style.display = "block"; }
+  if (mode === "table") { viewTableBtn.classList.add("active"); document.getElementById("tableExplainer").style.display = "block"; }
+  radarViews.style.display = mode === "radar" ? "block" : "none";
+  tableWrap.style.display = mode === "table" ? "block" : "none";
+  render();
+}
+viewRadarBtn.onclick = () => setView("radar");
+viewTableBtn.onclick = () => setView("table");
+
+function render() {
+  updateMatchCounts();
+  if (viewMode === "radar") renderRadar();
+  else renderTable();
+}
+
+render();
+</script>
+</body>
+</html>
