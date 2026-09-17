@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maidenhead United — Expected Points</title>
+<style>
+  :root {
+    --ink: #14110f; --paper: #f6f4ee; --panel: #ffffff;
+    --red: #c8102e; --red-dark: #8a0b20; --line: #e3ddce; --muted: #6f6a5c;
+    --blue: #2f6fb0; --green: #2f7d4f;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family:'Georgia','Iowan Old Style',serif; -webkit-font-smoothing:antialiased; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 40px 24px 80px; }
+  header { display:flex; justify-content:space-between; align-items:flex-end; border-bottom:3px solid var(--ink); padding-bottom:18px; margin-bottom:12px; flex-wrap:wrap; gap:12px; }
+  header h1 { font-size:30px; margin:0; font-weight:400; letter-spacing:-0.01em; }
+  header .titlegroup { display:flex; align-items:center; }
+  header .sub { font-family:'Helvetica Neue',Arial,sans-serif; font-size:13px; color:var(--muted); }
+  nav { font-family:'Helvetica Neue',Arial,sans-serif; font-size:13px; margin-bottom:24px; }
+  nav a { color:var(--muted); text-decoration:none; margin-right:16px; }
+  nav a.active { color:var(--red); font-weight:600; border-bottom:2px solid var(--red); padding-bottom:4px; }
+  nav a:hover { color:var(--ink); }
+
+  .note { font-family:'Helvetica Neue',Arial,sans-serif; font-size:12px; color:var(--muted); background:#fbf6ec; border:1px solid var(--line); border-radius:4px; padding:12px 14px; margin-bottom:22px; line-height:1.5; }
+  .note b { color:var(--ink); }
+
+  .view-switch { display:flex; justify-content:center; margin-bottom:8px; font-family:'Helvetica Neue',Arial,sans-serif; }
+  .view-switch .pillbar { display:inline-flex; border:1px solid var(--line); border-radius:999px; padding:3px; background:var(--panel); }
+  .view-switch button { display:inline-block; padding:8px 18px; border-radius:999px; font-size:12.5px; font-weight:600; letter-spacing:.02em; border:none; background:none; cursor:pointer; color:var(--muted); font-family:inherit; }
+  .view-switch button.active { background:var(--red); color:#fff; }
+  .view-switch button:hover:not(.active) { color:var(--ink); }
+
+  .content { max-width: 900px; margin: 0 auto; }
+
+  .methodnote { font-family:'Helvetica Neue',Arial,sans-serif; font-size:12.5px; color:var(--muted); line-height:1.6; margin: 4px auto 20px; max-width:820px; text-align:center; }
+  .methodnote strong { color:var(--ink); }
+
+  table.xp-table { width:100%; border-collapse:collapse; font-family:'Helvetica Neue',Arial,sans-serif; font-size:13px; background:var(--panel); border:1px solid var(--line); border-radius:4px; }
+  table.xp-table th, table.xp-table td { padding:9px 10px; text-align:right; border-bottom:1px solid var(--line); }
+  table.xp-table th:nth-child(2), table.xp-table td:nth-child(2) { text-align:left; }
+  table.xp-table thead th { font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); font-weight:600; border-bottom:2px solid var(--ink); cursor:pointer; user-select:none; white-space:nowrap; }
+  table.xp-table thead th:hover { color:var(--ink); }
+  table.xp-table thead th.sorted { color:var(--red); }
+  table.xp-table thead th .arrows { display:inline-flex; flex-direction:column; margin-left:3px; vertical-align:middle; line-height:0.6; }
+  table.xp-table thead th .arrows span { font-size:8px; color:var(--line); display:block; }
+  table.xp-table thead th .arrows span.active { color:var(--red); }
+  table.xp-table td.rank { color:var(--muted); font-variant-numeric: tabular-nums; }
+  table.xp-table td.team { font-weight:600; }
+  table.xp-table tr.mufc td { background:#fbecef; }
+  table.xp-table tr.mufc td.team { color:var(--red); }
+  table.xp-table td.diff-pos { color:var(--green); font-weight:600; }
+  table.xp-table td.diff-neg { color:var(--red); font-weight:600; }
+  table.xp-table td.xp-cell { font-weight:700; }
+
+  .explainer { font-family:'Helvetica Neue',Arial,sans-serif; font-size:12.5px; color:var(--muted); line-height:1.6; margin:24px auto 0; max-width:820px; }
+  .explainer strong { color:var(--ink); }
+
+  footer { margin-top:40px; padding-top:16px; border-top:1px solid var(--line); font-family:'Helvetica Neue',Arial,sans-serif; font-size:12px; color:var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="titlegroup">
+      <div>
+        <h1>Expected points</h1>
+        <div class="sub">Maidenhead United — 2026/27 National League South</div>
+      </div>
+    </div>
+  </header>
+  <nav>
+    <a href="index.html">Overview</a>
+    <a href="shotmap.html">Shot map</a>
+    <a href="shotzones.html">Shot zones</a>
+    <a href="setpiece.html">Set pieces</a>
+    <a href="discipline.html">Discipline</a>
+    <a href="playercomparison.html">Player comparison</a>
+    <a href="teamcomparison.html">Team comparison</a>
+    <a href="expectedpoints.html" class="active">Expected points</a>
+  </nav>
+
+  <div class="note">
+    <b>Expected points.</b> Built from the National League South 26/27 sheet plus Maidenhead's own raw data — 22 clubs, 7&ndash;9 matches each. Ebbsfleet United excluded (mostly postponed); Torquay United excluded pending re-extraction (duplicate rows). Some clubs have matches with goals but no shot/xG data recorded (Weston Super Mare and Folkestone Invicta worst affected) — <b>P</b> shows games played, with the number feeding the xG columns in brackets where lower. Click any column to sort.
+  </div>
+
+  <div class="view-switch">
+    <div class="pillbar">
+      <button type="button" id="viewClassicBtn" class="active">Classic</button>
+      <button type="button" id="viewHolisticBtn">Holistic (beta version)</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="methodnote" id="methodNote"></div>
+    <div id="tableWrap"></div>
+    <div class="explainer" id="explainer"></div>
+  </div>
+
+  <footer>Created by Julian Classen, for internal use only. Data from Sofascore.</footer>
+</div>
+
+<script>
+
+const MUFC = "Maidenhead United";
+
+// Classic xG-based xP: for every match with recorded xG_FOR/xG_AGAINST, the two are treated
+// as independent Poisson goal rates and every scoreline combination (0-10 each way) is summed
+// to give that match's P(win)/P(draw)/P(loss); XPTS = 3*P(win) + 1*P(draw), summed over all
+// matches with usable xG data. XGF/XGA are summed match xG for/against over those same matches;
+// XGD = XGF - XGA. W/D/L are actual results over every match played (not just xG-eligible ones).
+const classicData = {"Maidstone United":{"played":8,"w":6,"d":1,"l":1,"xp_matches":8,"xgf":16.74,"xga":11.07,"xgd":5.67,"xpts":13.72,"xpts_rate":1.72},"Weston Super Mare":{"played":8,"w":4,"d":2,"l":2,"xp_matches":6,"xgf":5.36,"xga":5.85,"xgd":-0.49,"xpts":7.78,"xpts_rate":1.3},"Dagenham & Redbridge":{"played":8,"w":5,"d":1,"l":2,"xp_matches":8,"xgf":13.72,"xga":9.6,"xgd":4.12,"xpts":12.82,"xpts_rate":1.6},"Tonbridge Angels":{"played":8,"w":4,"d":1,"l":3,"xp_matches":8,"xgf":14.58,"xga":7.57,"xgd":7.01,"xpts":14.49,"xpts_rate":1.81},"Truro City":{"played":7,"w":4,"d":2,"l":1,"xp_matches":7,"xgf":13.17,"xga":5.76,"xgd":7.41,"xpts":14.31,"xpts_rate":2.04},"Dover Athletic":{"played":8,"w":3,"d":2,"l":3,"xp_matches":7,"xgf":9.75,"xga":16.16,"xgd":-6.41,"xpts":6.35,"xpts_rate":0.91},"Dorking Wanderers":{"played":8,"w":3,"d":3,"l":2,"xp_matches":8,"xgf":13.81,"xga":11.76,"xgd":2.05,"xpts":12.92,"xpts_rate":1.61},"Farnham Town":{"played":7,"w":3,"d":1,"l":3,"xp_matches":7,"xgf":10.96,"xga":15.39,"xgd":-4.43,"xpts":7.24,"xpts_rate":1.03},"Salisbury":{"played":8,"w":3,"d":3,"l":2,"xp_matches":8,"xgf":18.21,"xga":8.77,"xgd":9.44,"xpts":16.0,"xpts_rate":2.0},"Folkestone Invicta":{"played":8,"w":3,"d":3,"l":2,"xp_matches":6,"xgf":12.97,"xga":11.25,"xgd":1.72,"xpts":9.36,"xpts_rate":1.56},"Billericay Town":{"played":8,"w":3,"d":3,"l":2,"xp_matches":8,"xgf":16.1,"xga":15.7,"xgd":0.4,"xpts":11.39,"xpts_rate":1.42},"Chesham United":{"played":8,"w":2,"d":1,"l":5,"xp_matches":8,"xgf":12.29,"xga":14.04,"xgd":-1.75,"xpts":9.97,"xpts_rate":1.25},"Chelmsford":{"played":7,"w":1,"d":6,"l":0,"xp_matches":7,"xgf":9.12,"xga":8.71,"xgd":0.41,"xpts":10.06,"xpts_rate":1.44},"Horsham":{"played":8,"w":2,"d":4,"l":2,"xp_matches":8,"xgf":12.38,"xga":11.07,"xgd":1.31,"xpts":12.1,"xpts_rate":1.51},"Hemel Hempstead":{"played":7,"w":2,"d":3,"l":2,"xp_matches":7,"xgf":9.42,"xga":12.84,"xgd":-3.42,"xpts":7.47,"xpts_rate":1.07},"Braintree Town":{"played":8,"w":3,"d":1,"l":4,"xp_matches":7,"xgf":10.28,"xga":13.03,"xgd":-2.75,"xpts":8.23,"xpts_rate":1.18},"AFC Totton":{"played":8,"w":3,"d":1,"l":4,"xp_matches":7,"xgf":12.28,"xga":12.84,"xgd":-0.56,"xpts":9.58,"xpts_rate":1.37},"Farnborough":{"played":8,"w":3,"d":1,"l":4,"xp_matches":8,"xgf":16.25,"xga":13.76,"xgd":2.49,"xpts":12.49,"xpts_rate":1.56},"Hampton & Richmond Borough":{"played":8,"w":2,"d":1,"l":5,"xp_matches":8,"xgf":12.31,"xga":17.26,"xgd":-4.95,"xpts":8.38,"xpts_rate":1.05},"Slough Town":{"played":8,"w":1,"d":0,"l":7,"xp_matches":8,"xgf":13.35,"xga":18.47,"xgd":-5.12,"xpts":8.03,"xpts_rate":1.0},"Walton & Hersham":{"played":8,"w":0,"d":1,"l":7,"xp_matches":8,"xgf":8.26,"xga":22.53,"xgd":-14.27,"xpts":4.34,"xpts_rate":0.54},"Maidenhead United":{"played":9,"w":2,"d":4,"l":3,"xp_matches":8,"xgf":11.28,"xga":14.54,"xgd":-3.26,"xpts":9.42,"xpts_rate":1.18}};
+
+// Holistic composite xP: for every match, seven underlying differentials (For minus Against) —
+// xG, total shots, shots on target, possession %, corners won, pass-completion %, and duel-win %
+// — are each standardised (z-scored) across the whole league dataset, then averaged into one
+// composite "performance" z-score for that match (features missing for a given match are simply
+// left out of that match's average, not zero-filled). A least-squares line is then fitted across
+// every match in the league — actual points earned (0/1/3) regressed on the composite z-score —
+// and that fitted line is used to convert each match's composite score into a expected-points
+// figure, clipped to the 0–3 range. Fit: xP = 1.339 + 0.479 x composite_z (R² = 0.053, n = 165).
+const holisticData = {"Maidstone United":{"played":8,"pts":19,"xp_matches":8,"pts_in_xp":19,"xp_rate":1.49,"diff_rate":0.89},"Weston Super Mare":{"played":8,"pts":14,"xp_matches":6,"pts_in_xp":11,"xp_rate":1.21,"diff_rate":0.63},"Dagenham & Redbridge":{"played":8,"pts":16,"xp_matches":8,"pts_in_xp":16,"xp_rate":1.4,"diff_rate":0.6},"Tonbridge Angels":{"played":8,"pts":13,"xp_matches":8,"pts_in_xp":13,"xp_rate":1.4,"diff_rate":0.22},"Truro City":{"played":7,"pts":14,"xp_matches":7,"pts_in_xp":14,"xp_rate":1.54,"diff_rate":0.46},"Dover Athletic":{"played":8,"pts":11,"xp_matches":7,"pts_in_xp":8,"xp_rate":1.03,"diff_rate":0.11},"Dorking Wanderers":{"played":8,"pts":12,"xp_matches":8,"pts_in_xp":12,"xp_rate":1.62,"diff_rate":-0.12},"Farnham Town":{"played":7,"pts":10,"xp_matches":7,"pts_in_xp":10,"xp_rate":1.26,"diff_rate":0.17},"Salisbury":{"played":8,"pts":12,"xp_matches":8,"pts_in_xp":12,"xp_rate":1.52,"diff_rate":-0.02},"Folkestone Invicta":{"played":8,"pts":12,"xp_matches":6,"pts_in_xp":9,"xp_rate":1.4,"diff_rate":0.1},"Billericay Town":{"played":8,"pts":12,"xp_matches":8,"pts_in_xp":12,"xp_rate":1.17,"diff_rate":0.33},"Chesham United":{"played":8,"pts":7,"xp_matches":8,"pts_in_xp":7,"xp_rate":1.42,"diff_rate":-0.55},"Chelmsford":{"played":7,"pts":9,"xp_matches":7,"pts_in_xp":9,"xp_rate":1.37,"diff_rate":-0.08},"Horsham":{"played":8,"pts":10,"xp_matches":8,"pts_in_xp":10,"xp_rate":1.42,"diff_rate":-0.17},"Hemel Hempstead":{"played":7,"pts":9,"xp_matches":7,"pts_in_xp":9,"xp_rate":1.19,"diff_rate":0.1},"Braintree Town":{"played":8,"pts":10,"xp_matches":7,"pts_in_xp":10,"xp_rate":1.4,"diff_rate":0.03},"AFC Totton":{"played":8,"pts":10,"xp_matches":7,"pts_in_xp":10,"xp_rate":1.28,"diff_rate":0.14},"Farnborough":{"played":8,"pts":10,"xp_matches":8,"pts_in_xp":10,"xp_rate":1.39,"diff_rate":-0.14},"Hampton & Richmond Borough":{"played":8,"pts":7,"xp_matches":8,"pts_in_xp":7,"xp_rate":1.27,"diff_rate":-0.39},"Slough Town":{"played":8,"pts":3,"xp_matches":8,"pts_in_xp":3,"xp_rate":1.22,"diff_rate":-0.85},"Walton & Hersham":{"played":8,"pts":1,"xp_matches":8,"pts_in_xp":1,"xp_rate":1.06,"diff_rate":-0.94},"Maidenhead United":{"played":9,"pts":10,"xp_matches":8,"pts_in_xp":9,"xp_rate":1.36,"diff_rate":-0.24}};
+
+function fmt(v, d=2) { return v.toFixed(d); }
+function signed(v, d=2) { return (v > 0 ? "+" : "") + fmt(v,d); }
+
+// Column definitions per view. key = field on each row object; label = header text;
+// format = how to render the cell; sortVal = numeric value used for sorting (defaults to raw field).
+const columnDefs = {
+  classic: [
+    { key: "pos",   label: "XPOS", sortable: false },
+    { key: "team",  label: "Team", sortable: true, align: "left", sortVal: r => r.team, format: r => r.team },
+    { key: "played",label: "P",    sortable: true, sortVal: r => r.played,
+      format: r => r.xp_matches < r.played ? `${r.played} <span style="color:var(--muted);font-size:10.5px;">(${r.xp_matches})</span>` : `${r.played}` },
+    { key: "w",     label: "W",    sortable: true, sortVal: r => r.w, format: r => r.w },
+    { key: "d",     label: "D",    sortable: true, sortVal: r => r.d, format: r => r.d },
+    { key: "l",     label: "L",    sortable: true, sortVal: r => r.l, format: r => r.l },
+    { key: "xgf",   label: "XGF",  sortable: true, sortVal: r => r.xgf, format: r => fmt(r.xgf,1) },
+    { key: "xga",   label: "XGA",  sortable: true, sortVal: r => r.xga, format: r => fmt(r.xga,1) },
+    { key: "xgd",   label: "XGD",  sortable: true, sortVal: r => r.xgd, format: r => signed(r.xgd,1) },
+    { key: "xpts",  label: "XPTS", sortable: true, sortVal: r => r.xpts, format: r => fmt(r.xpts,1), cellClass: "xp-cell" },
+    { key: "xpts_rate", label: "XPTS/M", sortable: true, sortVal: r => r.xpts_rate, format: r => fmt(r.xpts_rate,2), cellClass: "xp-cell" },
+  ],
+  holistic: [
+    { key: "pos",   label: "#",    sortable: false },
+    { key: "team",  label: "Team", sortable: true, align: "left", sortVal: r => r.team, format: r => r.team },
+    { key: "played",label: "P",    sortable: true, sortVal: r => r.played,
+      format: r => r.xp_matches < r.played ? `${r.played} <span style="color:var(--muted);font-size:10.5px;">(${r.xp_matches})</span>` : `${r.played}` },
+    { key: "pts",   label: "Pts",  sortable: true, sortVal: r => r.pts, format: r => r.pts },
+    { key: "xp_rate", label: "xP/match", sortable: true, sortVal: r => r.xp_rate, format: r => fmt(r.xp_rate,2), cellClass: "xp-cell" },
+    { key: "diff_rate", label: "Diff/match", sortable: true, sortVal: r => r.diff_rate,
+      format: r => signed(r.diff_rate,2), cellClass: r => r.diff_rate > 0.02 ? "diff-pos" : (r.diff_rate < -0.02 ? "diff-neg" : "") },
+  ]
+};
+
+// current sort state per view; classic defaults to XPTS/M desc, holistic to xP/match desc.
+const sortState = { classic: { key: "xpts_rate", dir: -1 }, holistic: { key: "xp_rate", dir: -1 } };
+let currentView = "classic";
+
+function renderTable(data, mode) {
+  const cols = columnDefs[mode];
+  const state = sortState[mode];
+  const rows = Object.entries(data).map(([team,d]) => ({team, ...d}));
+  const sortCol = cols.find(c => c.key === state.key);
+  if (sortCol) {
+    // dir === -1 means descending (highest first); dir === 1 means ascending.
+    rows.sort((a,b) => {
+      const va = sortCol.sortVal(a), vb = sortCol.sortVal(b);
+      if (typeof va === "string") return state.dir * va.localeCompare(vb);
+      return state.dir * (va - vb);
+    });
+  }
+  let html = `<table class="xp-table"><thead><tr>`;
+  cols.forEach(c => {
+    if (c.key === "pos") { html += `<th>${c.label}</th>`; return; }
+    const active = state.key === c.key;
+    const upActive = active && state.dir === 1;
+    const downActive = active && state.dir === -1;
+    html += `<th class="${active ? 'sorted' : ''}" data-key="${c.key}">${c.label}<span class="arrows"><span class="${upActive?'active':''}">&#9650;</span><span class="${downActive?'active':''}">&#9660;</span></span></th>`;
+  });
+  html += `</tr></thead><tbody>`;
+  rows.forEach((r,i) => {
+    const rowCls = r.team === MUFC ? "mufc" : "";
+    html += `<tr class="${rowCls}">`;
+    cols.forEach(c => {
+      if (c.key === "pos") { html += `<td class="rank">${i+1}</td>`; return; }
+      const cls = typeof c.cellClass === "function" ? c.cellClass(r) : (c.cellClass || (c.key === "team" ? "team" : ""));
+      html += `<td class="${cls}">${c.format(r)}</td>`;
+    });
+    html += `</tr>`;
+  });
+  html += `</tbody></table>`;
+  document.getElementById("tableWrap").innerHTML = html;
+
+  document.querySelectorAll("table.xp-table thead th[data-key]").forEach(th => {
+    th.onclick = () => {
+      const key = th.getAttribute("data-key");
+      const st = sortState[currentView];
+      if (st.key === key) { st.dir = -st.dir; } else { st.key = key; st.dir = -1; }
+      renderTable(currentView === "classic" ? classicData : holisticData, currentView);
+    };
+  });
+}
+
+const methodNotes = {
+  classic: `<strong>Reading this:</strong> a standard, xG-only model — the version used on most public analytics sites. XGF/XGA are total match xG for/against over games with usable data (bracketed in P where incomplete); XGD is the difference. XPTS is the cumulative points that chance quality implies; XPTS/M is the per-game rate, fairer while squads have played different numbers of matches. Click any column header to sort.`,
+  holistic: `<strong>Reading this:</strong> a broader model that blends seven metrics (xG, shots, shots on target, possession, corners, pass completion, duel win-rate) into one performance score per match before converting to points, rather than goals-quality alone. The fitted relationship between that composite score and actual points is weak (R² ≈ 0.05) — over 7–9 matches a side's underlying "shape of play" only loosely predicts the result on the day, which is itself informative about how much weight to put on process stats this early in a season. xP/match and Diff/match follow the same per-game logic as the classic table. Treat this table as a second opinion alongside the classic one, not a replacement for it.`
+};
+
+function setView(mode) {
+  currentView = mode;
+  document.getElementById("viewClassicBtn").classList.toggle("active", mode === "classic");
+  document.getElementById("viewHolisticBtn").classList.toggle("active", mode === "holistic");
+  document.getElementById("methodNote").innerHTML = methodNotes[mode];
+  renderTable(mode === "classic" ? classicData : holisticData, mode);
+}
+document.getElementById("viewClassicBtn").onclick = () => setView("classic");
+document.getElementById("viewHolisticBtn").onclick = () => setView("holistic");
+
+setView("classic");
+</script>
+</body>
+</html>
